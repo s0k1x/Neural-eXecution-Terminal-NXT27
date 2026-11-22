@@ -209,6 +209,7 @@ def("help","muestra la ayuda",(a)=>{
     "archivos":["ls","cd","pwd","cat","tac","head","tail","tree","find","grep","wc","stat","du","mkdir","rmdir","touch","rm","mv","cp","edit","nano"],
     "texto":["rev","upper","lower","sort","uniq","nl","tr","base64","rot13","hash","uuid","urlencode","urldecode","json","morse","password","seq","cal"],
     "sistema":["neofetch","whoami","uname","hostname","uptime","date","free","df","ps","top","battery","theme"],
+    "dev":["git"],
     "red":["ping","traceroute","ifconfig","speedtest"],
     "diversion":["figlet","banner","cowsay","cowthink","lolcat","fortune","matrix","sl","hack","8ball","dice","coin","roll","rps","guess","joke","yes"],
   };
@@ -374,6 +375,108 @@ def("coin","lanza una moneda",()=> Math.random()<.5?"🪙 cara":"🪙 cruz");
 def("roll","numero aleatorio 1-100",(a)=>{ const max=parseInt(a[0])||100; return "🎯 "+(Math.floor(Math.random()*max)+1); });
 def("yes","repite un texto",(a)=>{ const t=a.join(" ")||"y"; return Array(20).fill(t).join("\n"); });
 def("rps","piedra papel tijera",(a)=>{ const opts=["piedra","papel","tijera"]; const you=a[0]; if(!opts.includes(you)) return out("uso: rps piedra|papel|tijera","warn"); const cpu=opts[Math.floor(Math.random()*3)]; const win={piedra:"tijera",papel:"piedra",tijera:"papel"}; let res= you===cpu?"empate": win[you]===cpu?"ganas 🎉":"pierdes 💀"; return `tu: ${you} · cpu: ${cpu} → ${res}`; });
+
+/* --- git (sandbox, sobre el FS virtual) --- */
+function flattenFS(node,prefix,acc){ for(const k of Object.keys(node)){ const p=prefix?prefix+"/"+k:k; if(typeof node[k]==="object") flattenFS(node[k],p,acc); else acc[p]=node[k]; } return acc; }
+function shortHash(){ return Math.random().toString(16).slice(2,9); }
+function gitRepo(){ return state.git; }
+def("git","control de versiones (sandbox, sobre el FS virtual)",(a)=>{
+  const sub=(a[0]||"").toLowerCase(); const rest=a.slice(1);
+  if(sub==="init"){
+    if(state.git) return "Reinicializado repositorio Git en "+cwdLabel()+"/.git";
+    state.git={branch:"main",branches:{main:[]},staged:{},committed:{}}; save();
+    return "Inicializado repositorio Git vacio en "+cwdLabel()+"/.git";
+  }
+  const g=gitRepo();
+  if(!g&&sub!=="help"&&sub!=="") return out("fatal: no es un repositorio git (ejecuta 'git init')","err");
+  switch(sub){
+    case "":case "help":
+      return "uso: git <init|status|add|commit|log|branch|checkout|diff|restore|remote|push|clone|config>";
+    case "config":{
+      const key=rest[0], val=rest.slice(1).join(" ").replace(/^['"]|['"]$/g,"");
+      if(!key) return "user.name="+(state.env["user.name"]||"(sin definir)")+"\nuser.email="+(state.env["user.email"]||"(sin definir)");
+      state.env[key.replace(/^--global\s*/,"")]=val; save(); return "";
+    }
+    case "status":{
+      const wt=flattenFS(state.fs,"",{}); const head=g.committed;
+      const staged=Object.keys(g.staged);
+      const modified=[], untracked=[];
+      for(const p of Object.keys(wt)){
+        if(g.staged[p]!==undefined) continue;
+        if(!(p in head)) untracked.push(p);
+        else if(wt[p]!==head[p]) modified.push(p);
+      }
+      let s="En la rama "+g.branch;
+      s+="\n";
+      if(staged.length){ s+="\nCambios a confirmar:\n"+staged.map(p=>"  \u001b nuevo/mod: "+p).join("\n").replace(/\u001b/g,""); }
+      if(modified.length){ s+="\nCambios no preparados:\n"+modified.map(p=>"  modificado: "+p).join("\n"); }
+      if(untracked.length){ s+="\nArchivos sin seguimiento:\n"+untracked.map(p=>"  "+p).join("\n"); }
+      if(!staged.length&&!modified.length&&!untracked.length) s+="\nnada para confirmar, el arbol de trabajo esta limpio";
+      else s+="\n\n(usa 'git add <archivo>' y 'git commit -m msg')";
+      return s;
+    }
+    case "add":{
+      if(!rest.length) return out("Nada especificado. 'git add .' o 'git add archivo'","warn");
+      const wt=flattenFS(state.fs,"",{}); let n=0;
+      for(const target of rest){
+        if(target==="."||target==="-A"||target==="*"){ for(const p of Object.keys(wt)){ g.staged[p]=wt[p]; n++; } }
+        else { const segs=resolve(target); const rel=segs.join("/"); if(rel in wt){ g.staged[rel]=wt[rel]; n++; } else out("git add: no existe: "+target,"err"); }
+      }
+      save(); return "";
+    }
+    case "restore":{
+      if(rest[0]==="--staged"){ for(const t of rest.slice(1)){ const rel=resolve(t).join("/"); delete g.staged[rel]; } save(); return ""; }
+      return out("uso: git restore --staged <archivo>","warn");
+    }
+    case "commit":{
+      const mi=rest.indexOf("-m"); const msg= mi>=0? rest.slice(mi+1).join(" ").replace(/^['"]|['"]$/g,"") : "";
+      if(!msg) return out("uso: git commit -m \"mensaje\"","warn");
+      if(!Object.keys(g.staged).length) return out("nada para confirmar (usa 'git add')","warn");
+      const hash=shortHash(); const files=Object.keys(g.staged);
+      g.committed=Object.assign({},g.committed,g.staged);
+      g.branches[g.branch].push({hash,msg,time:new Date().toISOString(),files:files.slice(),snapshot:Object.assign({},g.committed)});
+      g.staged={}; save();
+      return `[${g.branch} ${hash}] ${msg}\n ${files.length} archivo(s) cambiado(s)`;
+    }
+    case "log":{
+      const commits=g.branches[g.branch]; if(!commits.length) return "(sin commits todavia)";
+      return commits.slice().reverse().map(c=>`commit ${c.hash}  (${g.branch})\nFecha: ${new Date(c.time).toLocaleString()}\n\n    ${c.msg}\n`).join("\n");
+    }
+    case "branch":{
+      if(!rest.length||rest[0]==="-a"||rest[0]==="--list"){ return Object.keys(g.branches).map(b=>(b===g.branch?"* ":"  ")+b).join("\n"); }
+      const name=rest[0]; if(g.branches[name]) return out("la rama '"+name+"' ya existe","err");
+      g.branches[name]=g.branches[g.branch].slice(); save(); return "";
+    }
+    case "checkout":{
+      if(rest[0]==="-b"){ const name=rest[1]; if(!name) return out("uso: git checkout -b nombre","warn"); if(g.branches[name])return out("ya existe","err"); g.branches[name]=g.branches[g.branch].slice(); g.branch=name; save(); return "Cambiado a nueva rama '"+name+"'"; }
+      const name=rest[0]; if(!g.branches[name]) return out("error: la rama '"+name+"' no existe","err");
+      g.branch=name; const commits=g.branches[name]; g.committed= commits.length? Object.assign({},commits[commits.length-1].snapshot):{}; save();
+      return "Cambiado a la rama '"+name+"'";
+    }
+    case "diff":{
+      const wt=flattenFS(state.fs,"",{}); const head=g.committed; let out2=[];
+      for(const p of Object.keys(wt)){ if(!(p in head)){ out2.push("+++ "+p+" (nuevo)"); } else if(wt[p]!==head[p]){ out2.push("--- "+p); toLines(head[p]).forEach(l=>out2.push("- "+l)); toLines(wt[p]).forEach(l=>out2.push("+ "+l)); } }
+      return out2.join("\n")||"(sin cambios)";
+    }
+    case "remote":{
+      if(rest[0]==="add"){ g.remote=rest[2]||rest[1]; save(); return ""; }
+      return g.remote? "origin  "+g.remote+" (fetch/push)":"(sin remotos)";
+    }
+    case "push":
+      out("Enumerando objetos: "+Object.keys(g.committed).length+", listo.","muted");
+      out("Escribiendo objetos: 100%","muted");
+      out("➜ "+(g.remote||"origin")+"  "+g.branch+" -> "+g.branch,"ok");
+      return out("(push simulado — esta terminal web no tiene red real hacia GitHub)","faint");
+    case "clone":{
+      const url=rest[0]||""; const dir=rest[1]|| (url.split("/").pop()||"repo").replace(/\.git$/,"");
+      const p=nodeAt(state.cwd); if(p[dir]) return out("fatal: ya existe '"+dir+"'","err");
+      p[dir]={ "README.md":"# "+dir+"\nClon simulado de "+url, ".gitkeep":"" }; save();
+      out("Clonando en '"+dir+"'...","muted");
+      return out("(clone simulado — sin red real; se creo una carpeta de ejemplo)","faint");
+    }
+    default: return out("git: '"+sub+"' no es un comando. Prueba 'git help'","err");
+  }
+},"git init | status | add . | commit -m \"msg\" | log | branch | checkout -b dev");
 
 /* interactive apps (not pipeable) */
 def("guess","adivina el numero (juego)",()=>{ guessGame(); });

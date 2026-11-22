@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';">
+<title>NXT27 Terminal</title>
+<link rel="stylesheet" href="../node_modules/@xterm/xterm/css/xterm.css">
+<style>
+  :root{--bg:#050308;--accent:#a855f7;--accent-bright:#c084fc;--line:#241834;--txt-dim:#8b82a0;--txt-faint:#564d6e}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;
+    font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+  #bar{display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;
+    background:#08050d;border-bottom:1px solid var(--line);color:var(--txt-dim);font-size:12px;
+    -webkit-app-region:drag;user-select:none}
+  #bar .hex{width:11px;height:11px;transform:rotate(45deg);background:var(--accent-bright);box-shadow:0 0 8px rgba(168,85,247,.6)}
+  #bar b{color:#d9d2ea;letter-spacing:1px}
+  #bar .spacer{flex:1}
+  #bar .tool{padding:1px 7px;border:1px solid var(--line);border-radius:5px;font-size:11px}
+  #bar .ok{color:#4ade80;border-color:#1f3d29}
+  #bar .no{color:#f87171;border-color:#3d1f22}
+  #setup{-webkit-app-region:no-drag;display:none;align-items:center;gap:6px;cursor:pointer;
+    background:linear-gradient(180deg,var(--accent),#6d28d9);color:#fff;border:0;border-radius:6px;
+    padding:5px 11px;font:inherit;font-size:11px;font-weight:700;box-shadow:0 0 8px rgba(168,85,247,.5)}
+  #term{position:absolute;top:36px;left:0;right:0;bottom:0;padding:8px 6px 6px 10px}
+  .xterm{height:100%}
+</style>
+</head>
+<body>
+  <div id="bar">
+    <span class="hex"></span><b>NXT27</b>
+    <span style="color:var(--txt-faint)">neural · execution · terminal</span>
+    <span class="spacer"></span>
+    <span id="tools"></span>
+    <button id="setup">⚙ Instalar dependencias</button>
+  </div>
+  <div id="term"></div>
+
+  <script src="../node_modules/@xterm/xterm/lib/xterm.js"></script>
+  <script src="../node_modules/@xterm/addon-fit/lib/addon-fit.js"></script>
+  <script src="../node_modules/@xterm/addon-web-links/lib/addon-web-links.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>
