@@ -4,158 +4,142 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NXT27 · Neural eXecution Terminal</title>
-<meta name="description" content="Neural eXecution Terminal NXT27 — pruébalo en el navegador o descárgalo para Windows.">
+<meta name="description" content="NXT27 — terminal web con estética hacker: comandos reales, IA, nube y un personaje con vida propia.">
 <style>
 :root{
-  --bg:#000;--panel:#0a0810;--line:#2a1c3a;--line-soft:#1a1324;
-  --violet:#a855f7;--violet-bright:#c084fc;--violet-dim:#6d28d9;
-  --txt:#e7e2f0;--txt-dim:#8b82a0;--txt-faint:#5a5270;--white:#fff;
-  --glow:0 0 10px rgba(168,85,247,.5),0 0 26px rgba(168,85,247,.22);
+  --bg:#050308;--line:#201630;--line-soft:#140e1f;
+  --accent:#a855f7;--accent-bright:#c084fc;--accent-dim:#6d28d9;
+  --txt:#d9d2ea;--txt-dim:#8b82a0;--txt-faint:#564d6e;
+  --glow:0 0 10px rgba(168,85,247,.45);
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--txt);
-  font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
-  min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-a{color:inherit}
-.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+body{background:var(--bg);color:var(--txt);min-height:100dvh;overflow-x:hidden;
+  font-family:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  -webkit-font-smoothing:antialiased;line-height:1.5}
+/* subtle hacker backdrop */
+body::before{content:"";position:fixed;inset:0;z-index:-2;
+  background:radial-gradient(1000px 520px at 50% -12%,rgba(109,40,217,.16),transparent 62%)}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(rgba(168,85,247,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(168,85,247,.05) 1px,transparent 1px);
+  background-size:46px 46px;mask-image:radial-gradient(circle at 50% 10%,#000,transparent 72%)}
+a{color:var(--accent-bright);text-decoration:none}
+.wrap{max-width:820px;margin:0 auto;padding:0 20px}
 
-/* animated backdrop */
-#bg{position:fixed;inset:0;z-index:-1;opacity:.5;
-  background:
-    radial-gradient(1200px 600px at 50% -10%,rgba(109,40,217,.22),transparent 60%),
-    repeating-linear-gradient(0deg,transparent 0 38px,rgba(168,85,247,.035) 38px 39px);}
-#grid{position:fixed;inset:0;z-index:-1;opacity:.25;pointer-events:none;
-  background-image:linear-gradient(rgba(168,85,247,.08) 1px,transparent 1px),
-                   linear-gradient(90deg,rgba(168,85,247,.08) 1px,transparent 1px);
-  background-size:44px 44px;mask-image:radial-gradient(circle at 50% 20%,#000,transparent 75%)}
+header{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;letter-spacing:1px;color:var(--txt)}
+.brand .hex{width:12px;height:12px;transform:rotate(45deg);background:var(--accent-bright);box-shadow:var(--glow)}
+.nav{display:flex;gap:8px}
+.nav a{font-size:12px;color:var(--txt-dim);border:1px solid var(--line);padding:7px 12px;border-radius:8px}
+.nav a:hover{color:var(--txt);border-color:var(--accent-dim)}
 
-/* header */
-header{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
-.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:1px}
-.brand .hex{width:14px;height:14px;transform:rotate(45deg);background:var(--violet-bright);box-shadow:var(--glow)}
-.ghlink{font-size:12px;color:var(--txt-dim);text-decoration:none;border:1px solid var(--line);padding:7px 12px;border-radius:7px}
-.ghlink:hover{color:var(--txt);border-color:var(--violet-dim)}
+.hero{text-align:center;padding:52px 0 8px}
+.eyebrow{font-size:11px;letter-spacing:5px;color:var(--accent-bright);text-transform:uppercase}
+h1{margin:16px 0 4px;font-weight:800;letter-spacing:3px;font-size:clamp(46px,13vw,104px);color:#fff;text-shadow:var(--glow)}
+h1 b{color:var(--accent-bright)}
+/* terminal line motif */
+.cmd{display:inline-flex;align-items:center;gap:0;margin:14px auto 0;padding:10px 16px;border:1px solid var(--line);border-radius:10px;
+  background:#0a0710;font-size:14px;max-width:92vw;overflow:hidden;white-space:nowrap}
+.cmd .ps{color:var(--accent-bright)}
+.cmd .t{color:var(--txt)}
+.cmd .cur{display:inline-block;width:8px;height:16px;background:var(--accent-bright);margin-left:3px;vertical-align:-3px;animation:bl 1s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+.tag{color:var(--txt-dim);font-size:14px;max-width:540px;margin:20px auto 0}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:26px 0 6px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;border:1px solid transparent;transition:.15s}
+.btn.primary{background:linear-gradient(180deg,var(--accent),var(--accent-dim));color:#fff;box-shadow:var(--glow)}
+.btn.primary:hover{transform:translateY(-1px)}
+.btn.ghost{border-color:var(--line);color:var(--txt);background:rgba(168,85,247,.05)}
+.btn.ghost:hover{border-color:var(--accent-dim)}
+.chips{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin:26px 0 0}
+.chip{font-size:11px;color:var(--txt-dim);border:1px solid var(--line-soft);border-radius:20px;padding:5px 12px}
+.chip b{color:var(--accent-bright);font-weight:700}
 
-/* hero */
-.hero{text-align:center;padding:40px 0 10px}
-.eyebrow{font-size:12px;letter-spacing:4px;color:var(--violet-bright);text-transform:uppercase}
-h1{font-family:Arial,Helvetica,sans-serif;font-weight:800;letter-spacing:2px;margin:12px 0 6px;
-  font-size:clamp(40px,10vw,96px);color:var(--white);text-shadow:var(--glow)}
-h1 b{color:var(--violet-bright)}
-.tag{color:var(--txt-dim);font-size:14px;max-width:560px;margin:0 auto}
-.note{margin-top:10px;font-size:11px;color:var(--txt-faint)}
-
-.cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:30px 0 10px}
-.btn{display:inline-flex;align-items:center;gap:9px;padding:14px 22px;border-radius:10px;
-  font-weight:700;font-size:14px;text-decoration:none;cursor:pointer;border:1px solid transparent;transition:.15s}
-.btn.primary{background:linear-gradient(180deg,var(--violet),var(--violet-dim));color:#fff;box-shadow:var(--glow)}
-.btn.primary:hover{transform:translateY(-1px);box-shadow:0 0 16px rgba(168,85,247,.7)}
-.btn.ghost{background:rgba(168,85,247,.06);border-color:var(--line);color:var(--txt)}
-.btn.ghost:hover{border-color:var(--violet-dim);color:var(--white)}
-
-/* preview window */
-.preview{margin:34px auto 10px;border:1px solid var(--line);border-radius:12px;overflow:hidden;
-  background:var(--panel);box-shadow:0 30px 90px rgba(0,0,0,.7)}
-.pv-bar{height:34px;display:flex;align-items:center;gap:8px;padding:0 12px;background:#0a0810;border-bottom:1px solid var(--line-soft);font-size:12px;color:var(--txt-dim)}
-.pv-dot{width:9px;height:9px;border:1px solid var(--line);border-radius:2px}
-.pv-url{margin-left:10px;color:var(--txt-faint)}
-.pv-frame{position:relative;aspect-ratio:16/10;background:#000}
+.preview{margin:40px auto 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.pv-bar{height:32px;display:flex;align-items:center;gap:7px;padding:0 12px;background:#08050d;border-bottom:1px solid var(--line-soft);font-size:12px;color:var(--txt-faint)}
+.pv-dot{width:8px;height:8px;border:1px solid var(--line);border-radius:50%}
+.pv-url{margin-left:8px}
+.pv-frame{position:relative;aspect-ratio:16/10;background:#050308}
 .pv-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-.pv-launch{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
-  background:radial-gradient(circle at 50% 50%,rgba(109,40,217,.25),#000 70%);cursor:pointer}
-.pv-launch .play{width:64px;height:64px;border-radius:50%;border:1px solid var(--violet);display:flex;align-items:center;justify-content:center;
-  background:rgba(168,85,247,.12);box-shadow:var(--glow)}
-.pv-launch .play:after{content:"";border-left:18px solid var(--violet-bright);border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px}
-.pv-launch span{font-size:12px;letter-spacing:2px;color:var(--txt-dim);text-transform:uppercase}
+.pv-launch{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;
+  background:radial-gradient(circle at 50% 50%,rgba(109,40,217,.2),transparent 70%)}
+.pv-launch .play{width:58px;height:58px;border-radius:50%;border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;background:rgba(168,85,247,.1);box-shadow:var(--glow)}
+.pv-launch .play:after{content:"";border-left:16px solid var(--accent-bright);border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px}
+.pv-launch span{font-size:11px;letter-spacing:2px;color:var(--txt-dim);text-transform:uppercase}
 
-/* cards */
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:34px 0 10px}
-.card{border:1px solid var(--line-soft);border-radius:10px;padding:18px;background:rgba(255,255,255,.012)}
-.card h3{margin:0 0 6px;font-size:14px;color:var(--white)}
-.card h3 b{color:var(--violet-bright);margin-right:7px}
-.card p{margin:0;font-size:12.5px;color:var(--txt-dim);line-height:1.5}
-.card code{display:block;margin-top:10px;background:#07060b;border:1px solid var(--line-soft);border-radius:7px;
-  padding:10px;font-size:11.5px;color:var(--violet-bright);overflow:auto;white-space:nowrap}
-.copy{margin-top:8px;font-size:11px;color:var(--txt-faint);background:transparent;border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
-.copy:hover{color:var(--txt);border-color:var(--violet-dim)}
-@media(max-width:720px){.cards{grid-template-columns:1fr}}
+.get{margin:40px auto 0;display:flex;flex-direction:column;gap:12px}
+.getrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--txt-dim)}
+.getrow .k{color:var(--accent-bright);min-width:92px}
+.getrow code{flex:1;min-width:220px;background:#0a0710;border:1px solid var(--line-soft);border-radius:8px;padding:9px 12px;color:var(--accent-bright);font-size:12px;overflow:auto;white-space:nowrap}
+.copy{font-size:11px;color:var(--txt-faint);background:transparent;border:1px solid var(--line);border-radius:7px;padding:7px 11px;cursor:pointer;white-space:nowrap}
+.copy:hover{color:var(--txt);border-color:var(--accent-dim)}
 
-footer{text-align:center;color:var(--txt-faint);font-size:11px;padding:40px 0 30px;line-height:1.7}
-.disclaimer{max-width:620px;margin:20px auto 0;font-size:11px;color:var(--txt-faint);border-top:1px solid var(--line-soft);padding-top:18px}
+footer{text-align:center;color:var(--txt-faint);font-size:11px;padding:48px 0 34px}
 </style>
 </head>
 <body>
-<div id="bg"></div><div id="grid"></div>
-
 <div class="wrap">
   <header>
     <div class="brand"><span class="hex"></span>NXT27</div>
-    <a class="ghlink" href="https://github.com/s0k1x/Neural-eXecution-Terminal-NXT27" target="_blank" rel="noopener">★ GitHub</a>
+    <nav class="nav">
+      <a href="./terminal.html">terminal</a>
+      <a href="https://github.com/s0k1x/Neural-eXecution-Terminal-NXT27" target="_blank" rel="noopener">github ↗</a>
+    </nav>
   </header>
 
   <section class="hero">
-    <div class="eyebrow">Neural · eXecution · Terminal</div>
+    <div class="eyebrow">neural · execution · terminal</div>
     <h1><b>NXT</b>27</h1>
-    <p class="tag">Terminal web funcional con estética hacker: escribe comandos reales (ls, cat, calc, neofetch, theme…). Pruébala en el navegador o descárgala para Windows.</p>
+    <div class="cmd"><span class="ps">neural@NXT-27:~$&nbsp;</span><span class="t" id="typed"></span><span class="cur"></span></div>
+    <p class="tag">Terminal web con estética hacker. Comandos reales, IA (Gemini), nube y un personaje con vida propia. Todo en el navegador.</p>
     <div class="cta">
-      <a class="btn primary" href="./terminal.html">▶ Abrir en el navegador</a>
-      <a class="btn ghost" id="dl" href="https://github.com/s0k1x/Neural-eXecution-Terminal-NXT27/releases/latest" target="_blank" rel="noopener">⤓ Descargar .exe (Windows)</a>
+      <a class="btn primary" href="./terminal.html">▶ Abrir terminal</a>
+      <a class="btn ghost" href="https://github.com/s0k1x/Neural-eXecution-Terminal-NXT27" target="_blank" rel="noopener">★ GitHub</a>
     </div>
-    <p class="note">¿Sin release todavía? El .exe también está en <a href="https://github.com/s0k1x/Neural-eXecution-Terminal-NXT27/actions" target="_blank" rel="noopener" style="color:var(--violet-bright)">Actions → Artifacts</a>. Demo visual: los módulos no ejecutan nada.</p>
+    <div class="chips">
+      <span class="chip"><b>+120</b> comandos</span>
+      <span class="chip">IA · <b>ask</b></span>
+      <span class="chip">nube · <b>wall</b></span>
+      <span class="chip">personaje · <b>puppet</b></span>
+      <span class="chip">pipes · temas</span>
+    </div>
   </section>
 
   <section class="preview">
     <div class="pv-bar"><span class="pv-dot"></span><span class="pv-dot"></span><span class="pv-dot"></span><span class="pv-url">nxt27://terminal</span></div>
-    <div class="pv-frame">
-      <div class="pv-launch" id="launch">
-        <div class="play"></div>
-        <span>Pulsa para iniciar la demo</span>
-      </div>
-    </div>
+    <div class="pv-frame"><div class="pv-launch" id="launch"><div class="play"></div><span>pulsa para iniciar</span></div></div>
   </section>
 
-  <section class="cards">
-    <div class="card">
-      <h3><b>01</b> Navegador</h3>
-      <p>Nada que instalar. Ábrelo y listo, también en el móvil.</p>
-      <a class="btn ghost" href="./terminal.html" style="margin-top:12px;padding:9px 14px;font-size:12px">Abrir ahora</a>
-    </div>
-    <div class="card">
-      <h3><b>02</b> Un comando</h3>
-      <p>Termux / Linux: descarga, sirve y abre solo.</p>
-      <code id="cmd">curl -fsSL https://raw.githubusercontent.com/s0k1x/Neural-eXecution-Terminal-NXT27/main/nxt27.sh | bash</code>
-      <button class="copy" data-copy="cmd">Copiar comando</button>
-    </div>
-    <div class="card">
-      <h3><b>03</b> Windows .exe</h3>
-      <p>App de escritorio firmada (Authenticode). Abre la terminal en su ventana.</p>
-      <a class="btn ghost" href="https://github.com/s0k1x/Neural-eXecution-Terminal-NXT27/releases/latest" target="_blank" rel="noopener" style="margin-top:12px;padding:9px 14px;font-size:12px">Ir a descargas</a>
-    </div>
+  <section class="get">
+    <div class="getrow"><span class="k">1 comando</span>
+      <code id="cmd1">curl -fsSL https://raw.githubusercontent.com/s0k1x/Neural-eXecution-Terminal-NXT27/main/nxt27.sh | bash</code>
+      <button class="copy" data-copy="cmd1">copiar</button></div>
+    <div class="getrow"><span class="k">Windows</span>
+      <span>app de escritorio (terminal real) · <a href="https://github.com/s0k1x/Neural-eXecution-Terminal-NXT27/actions" target="_blank" rel="noopener">Actions → Artifacts</a></span></div>
   </section>
 
-  <p class="disclaimer">NXT27 es una <b>demo visual</b>. Los módulos son cáscaras no funcionales ("DEMO · SIN FUNCIONALIDAD"): no generan ni ejecutan nada. Hecho con fines estéticos.</p>
-
-  <footer>
-    Neural eXecution Terminal · NXT27<br>
-    <a href="https://github.com/s0k1x/Neural-eXecution-Terminal-NXT27" target="_blank" rel="noopener" style="color:var(--violet-dim)">github.com/s0k1x/Neural-eXecution-Terminal-NXT27</a>
-  </footer>
+  <footer>Neural eXecution Terminal · NXT27 — <a href="https://github.com/s0k1x/Neural-eXecution-Terminal-NXT27" target="_blank" rel="noopener">s0k1x/Neural-eXecution-Terminal-NXT27</a></footer>
 </div>
 
 <script>
-  // Launch embedded demo on click (keeps page light until requested)
+  // typed command motif
+  const words=["neofetch","puppet","figlet NXT | lolcat","ask hola","wall hola a todos","dashboard"];
+  const t=document.getElementById("typed"); let wi=0,ci=0,del=false;
+  (function type(){ const w=words[wi]; t.textContent=w.slice(0,ci);
+    if(!del&&ci<w.length){ci++;setTimeout(type,70);}
+    else if(!del){del=true;setTimeout(type,1400);}
+    else if(ci>0){ci--;setTimeout(type,30);}
+    else{del=false;wi=(wi+1)%words.length;setTimeout(type,250);} })();
+  // launch embedded demo on click
   document.getElementById("launch").addEventListener("click",function(){
-    const f=document.createElement("iframe");
-    f.src="./terminal.html";f.title="NXT27 Terminal";f.allow="fullscreen";
+    const f=document.createElement("iframe");f.src="./terminal.html";f.title="NXT27 Terminal";f.allow="fullscreen";
     this.parentElement.appendChild(f);this.remove();
   });
-  // Copy buttons
-  document.querySelectorAll(".copy").forEach(b=>{
-    b.addEventListener("click",()=>{
-      const t=document.getElementById(b.dataset.copy).textContent;
-      navigator.clipboard?.writeText(t).then(()=>{const o=b.textContent;b.textContent="✓ Copiado";setTimeout(()=>b.textContent=o,1500);}).catch(()=>{});
-    });
-  });
+  // copy
+  document.querySelectorAll(".copy").forEach(b=>b.addEventListener("click",()=>{
+    const el=document.getElementById(b.dataset.copy);
+    navigator.clipboard?.writeText(el.textContent).then(()=>{const o=b.textContent;b.textContent="✓ copiado";setTimeout(()=>b.textContent=o,1400);}).catch(()=>{});
+  }));
 </script>
 </body>
 </html>
