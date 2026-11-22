@@ -32,7 +32,12 @@ Todo funciona **offline**, sin servidores. Prueba en vivo:
 - **Texto:** `rev` `upper` `lower` `sort` `uniq` `nl` `tr` `base64` `rot13` `hash` `uuid` `urlencode` `urldecode` `json` `morse` `password` `seq` `cal`
 - **Sistema:** `neofetch` `whoami` `uname` `hostname` `uptime` `date` `free` `df` `ps` `top` `battery` `theme`
 - **Red (simulado):** `ping` `traceroute` `ifconfig` `speedtest`
+- **Dev:** `git` (init/add/commit/log/branch/checkout/diff sobre el FS virtual)
+- **Nube (Supabase):** `wall` (muro global) · `save`/`load` (guardar en la nube con código) · `paste`/`getpaste` · `rank` · `stats`
+- **Visual:** `dashboard` `chart` `plot` `gauge` `progress` `button` `card` `table` `palette` `color` `icon` `icons` `clock`
 - **Diversión:** `figlet` `banner` `cowsay` `cowthink` `lolcat` `fortune` `matrix` `sl` `hack` `8ball` `dice` `coin` `roll` `rps` `guess` `joke` `yes`
+
+Al abrir la terminal verás una **secuencia de arranque animada** y, la primera vez, un **asistente** para elegir color, nombre y efectos (reábrelo con `setup`). Los comandos visuales **generan cosas dentro de la terminal** (gráficos, botones clicables, tarjetas, medidores). La **nube** usa un backend propio en Supabase (muro compartido, guardado en la nube, pastebin, ranking).
 
 **Potencia:**
 ```sh

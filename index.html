@@ -23,6 +23,8 @@ body{
 body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
   background:radial-gradient(900px 500px at 50% -8%,rgba(109,40,217,.15),transparent 60%),
     repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,.22) 3px 4px);opacity:.7}
+body.no-fx::before{opacity:0}
+body.no-fx{--glow:none}
 #app{position:relative;z-index:1;display:flex;flex-direction:column;height:100dvh}
 .bar{display:flex;align-items:center;gap:10px;padding:8px 14px;background:#08050d;
   border-bottom:1px solid var(--line-soft);font-size:12px;color:var(--txt-dim)}
@@ -47,6 +49,71 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
   caret-color:var(--accent-bright);padding:0;margin:0;position:relative;z-index:2}
 #ghost{position:absolute;left:0;top:0;color:var(--txt-faint);pointer-events:none;white-space:pre;z-index:1}
 a{color:var(--accent-bright)}
+
+/* ---------- icons ---------- */
+svg.icon{width:1em;height:1em;vertical-align:-.12em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.icon-lg{width:1.5em;height:1.5em}
+
+/* ---------- boot sequence ---------- */
+#boot{position:fixed;inset:0;z-index:70;display:none;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  background:var(--bg);text-align:center;padding:24px}
+#boot .blogo{color:var(--accent-bright);text-shadow:var(--glow);line-height:1.1;font-size:clamp(9px,2.4vw,13px);animation:fadeUp .6s ease both}
+#boot .btitle{font-size:13px;letter-spacing:4px;color:var(--txt-dim);text-transform:uppercase}
+#boot .bprog{width:min(420px,80vw);height:6px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#0a0710}
+#boot .bfill{height:100%;width:0;background:linear-gradient(90deg,var(--accent-dim),var(--accent-bright));box-shadow:var(--glow);transition:width .25s ease}
+#boot .bpct{font-size:12px;color:var(--accent-bright);font-weight:700}
+#boot .blog{width:min(420px,80vw);text-align:left;font-size:12px;color:var(--txt-faint);min-height:120px}
+#boot .blog .ok{color:var(--ok)}
+
+/* ---------- wizard ---------- */
+#wizard{position:fixed;inset:0;z-index:71;display:none;align-items:center;justify-content:center;background:radial-gradient(800px 500px at 50% 0%,rgba(109,40,217,.18),var(--bg) 70%);padding:20px}
+.wcard{width:min(460px,94vw);background:linear-gradient(180deg,#0b0712,#08050d);border:1px solid var(--line);border-radius:16px;
+  padding:26px;box-shadow:0 30px 80px rgba(0,0,0,.6);animation:fadeUp .5s ease both}
+.wcard h2{margin:0 0 4px;font-size:18px;color:#fff;letter-spacing:.5px;display:flex;align-items:center;gap:9px}
+.wcard h2 .icon{color:var(--accent-bright)}
+.wcard .wsub{margin:0 0 20px;font-size:12.5px;color:var(--txt-dim)}
+.wstep{margin:18px 0}
+.wstep .wlabel{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt-faint);margin-bottom:9px}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.swatch{width:34px;height:34px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:.15s;position:relative}
+.swatch:hover{transform:scale(1.12)}
+.swatch.sel{border-color:#fff;box-shadow:0 0 0 2px var(--bg),0 0 12px currentColor}
+.wname{width:100%;background:#07060b;border:1px solid var(--line);border-radius:9px;padding:11px 13px;color:var(--txt);font:inherit;outline:0}
+.wname:focus{border-color:var(--accent-dim)}
+.wtoggle{display:flex;gap:10px}
+.wopt{flex:1;text-align:center;padding:9px;border:1px solid var(--line);border-radius:9px;cursor:pointer;font-size:12.5px;color:var(--txt-dim);transition:.15s}
+.wopt.sel{border-color:var(--accent);color:#fff;background:rgba(168,85,247,.12)}
+.wgo{width:100%;margin-top:22px;padding:13px;border:0;border-radius:10px;cursor:pointer;font:inherit;font-weight:700;font-size:14px;
+  color:#fff;background:linear-gradient(180deg,var(--accent),var(--accent-dim));box-shadow:var(--glow);display:flex;align-items:center;justify-content:center;gap:8px}
+.wgo:hover{filter:brightness(1.1)}
+
+/* ---------- inline widgets ---------- */
+.nxt-widget{display:inline-block;margin:6px 0;animation:fadeUp .35s ease both}
+.nxt-btn{display:inline-flex;align-items:center;gap:7px;margin:4px 6px 4px 0;padding:8px 14px;border-radius:9px;cursor:pointer;
+  font:inherit;font-size:13px;font-weight:600;color:#fff;border:1px solid var(--accent-dim);
+  background:linear-gradient(180deg,rgba(168,85,247,.25),rgba(109,40,217,.15));transition:.14s;animation:fadeUp .3s ease both}
+.nxt-btn:hover{border-color:var(--accent-bright);box-shadow:var(--glow);transform:translateY(-1px)}
+.nxt-btn:active{transform:translateY(0)}
+.nxt-card{display:inline-block;min-width:240px;max-width:100%;margin:6px 0;border:1px solid var(--line);border-radius:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,.015),transparent);padding:14px 16px;animation:fadeUp .35s ease both}
+.nxt-card .hd{display:flex;align-items:center;gap:8px;color:#fff;font-weight:700;margin-bottom:6px}
+.nxt-card .hd .icon{color:var(--accent-bright)}
+.nxt-card .bd{font-size:12.5px;color:var(--txt-dim);line-height:1.5}
+.nxt-table{border-collapse:collapse;margin:6px 0;font-size:12.5px;animation:fadeUp .3s ease both}
+.nxt-table td,.nxt-table th{border:1px solid var(--line-soft);padding:6px 12px;text-align:left}
+.nxt-table th{color:var(--accent-bright);background:rgba(168,85,247,.06)}
+.chart-svg,.gauge-svg{display:block;margin:6px 0;overflow:visible}
+.chart-svg rect{transform-origin:bottom;animation:barGrow .6s cubic-bezier(.2,.8,.2,1) both}
+.chart-svg .lbl{fill:var(--txt-faint);font:10px monospace}
+.chart-svg .val{fill:var(--txt-dim);font:10px monospace}
+.swatch-chip{display:inline-flex;align-items:center;gap:8px;margin:3px 10px 3px 0;font-size:12px;color:var(--txt-dim)}
+.swatch-chip i{width:16px;height:16px;border-radius:4px;display:inline-block}
+.widget-clock{font-size:34px;font-weight:700;color:var(--accent-bright);text-shadow:var(--glow);letter-spacing:2px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes barGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 /* overlays */
 #overlay{position:fixed;inset:0;z-index:50;display:none;background:#000}
 #overlay canvas{width:100%;height:100%;display:block}
@@ -76,6 +143,39 @@ a{color:var(--accent-bright)}
   </form>
 </div>
 
+<div id="boot">
+  <pre class="blogo" id="bootLogo"></pre>
+  <div class="btitle">Preparando NXT27</div>
+  <div class="bprog"><div class="bfill" id="bootFill"></div></div>
+  <div class="bpct" id="bootPct">0%</div>
+  <div class="blog" id="bootLog"></div>
+</div>
+
+<div id="wizard">
+  <div class="wcard">
+    <h2><svg class="icon icon-lg" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Bienvenido a NXT27</h2>
+    <p class="wsub">Personaliza tu terminal. Puedes cambiarlo luego con <b>setup</b>.</p>
+    <div class="wstep">
+      <div class="wlabel">Color de acento</div>
+      <div class="swatches" id="wSwatches"></div>
+    </div>
+    <div class="wstep">
+      <div class="wlabel">¿Cómo te llamas?</div>
+      <input class="wname" id="wName" maxlength="18" placeholder="neural" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="wstep">
+      <div class="wlabel">Efectos visuales</div>
+      <div class="wtoggle" id="wEffects">
+        <div class="wopt sel" data-v="on">✦ Activados</div>
+        <div class="wopt" data-v="off">○ Mínimos</div>
+      </div>
+    </div>
+    <button class="wgo" id="wGo">Entrar
+      <svg class="icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  </div>
+</div>
+
 <div id="overlay"><canvas id="ocanvas"></canvas></div>
 <div id="editor">
   <div class="eh"><b id="edName"></b><span class="spacer" style="flex:1"></span>
@@ -90,11 +190,11 @@ a{color:var(--accent-bright)}
    ============================================================ */
 const term=document.getElementById("term"), input=document.getElementById("cmd"),
       ghost=document.getElementById("ghost"), ps1El=document.getElementById("ps1"), clkEl=document.getElementById("clk");
-const USER="neural", HOST="NXT-27", started=Date.now();
+let USER="neural"; const HOST="NXT-27", started=Date.now();
 const LS="nxt27.state";
 
 /* ---------- persistent state ---------- */
-let state={ fs:null, cwd:[], hist:[], aliases:{}, env:{USER:"neural",HOST:"NXT-27",SHELL:"nxt-sh",HOME:"~"}, theme:"violet" };
+let state={ fs:null, cwd:[], hist:[], aliases:{}, env:{USER:"neural",HOST:"NXT-27",SHELL:"nxt-sh",HOME:"~"}, theme:"violet", username:"neural", setupDone:false, effects:true };
 const DEFAULT_FS={
   "readme.txt":"NXT27 — Neural eXecution Terminal\nTerminal web ultra completa. Escribe 'help'.\nPrueba: neofetch · figlet HOLA · fortune | cowsay | lolcat · matrix",
   "about.txt":"Terminal con comandos reales, pipes, temas, editor y mas. Todo offline.",
@@ -109,6 +209,45 @@ function load(){
 }
 function save(){ try{ localStorage.setItem(LS,JSON.stringify(state)); }catch{} }
 load();
+USER=state.username||"neural";
+function applyEffects(){ document.body.classList.toggle("no-fx", !state.effects); }
+
+/* ---------- Supabase backend (cloud) ---------- */
+const SB_URL="https://qlqcfihxqpmfjapzhobc.supabase.co";
+const SB_KEY="sb_publishable_anWipRYZoGrwuiiH1-HhIA_Oh4VgLIH";
+async function sb(action,payload={}){
+  let r;
+  try{ r=await fetch(SB_URL+"/functions/v1/nxt",{method:"POST",
+    headers:{"Content-Type":"application/json","apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY},
+    body:JSON.stringify(Object.assign({action},payload))}); }
+  catch(e){ throw new Error("sin conexion con la nube"); }
+  let j; try{ j=await r.json(); }catch{ j={error:"respuesta invalida"}; }
+  if(!r.ok||j.error) throw new Error(j.error||("HTTP "+r.status));
+  return j;
+}
+
+/* ---------- icons (inline SVG, lucide-style) ---------- */
+const ICONS={
+  terminal:'<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>',
+  zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  box:'<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/><line x1="12" y1="13" x2="12" y2="22"/>',
+  lock:'<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  cpu:'<rect x="6" y="6" width="12" height="12" rx="1"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/>',
+  wifi:'<path d="M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1"/>',
+  folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  star:'<polygon points="12 2 15 9 22 9 16 14 18 21 12 17 6 21 8 14 2 9 9 9"/>',
+  heart:'<path d="M20 8c0-2.5-2-4.5-4.5-4.5C14 3.5 12.5 4.5 12 6c-.5-1.5-2-2.5-3.5-2.5C6 3.5 4 5.5 4 8c0 4 8 10 8 10s8-6 8-10z"/>',
+  ghost:'<path d="M12 2a7 7 0 0 0-7 7v11l2.5-2 2.5 2 2-2 2 2 2.5-2 2.5 2V9a7 7 0 0 0-7-7z"/><circle cx="9.5" cy="10" r="1"/><circle cx="14.5" cy="10" r="1"/>',
+  rocket:'<path d="M5 15c-1.5 1.5-2 5-2 5s3.5-.5 5-2a3 3 0 0 0-3-3z"/><path d="M9 11a16 16 0 0 1 8-8c2 0 3 1 3 3a16 16 0 0 1-8 8z"/><circle cx="15" cy="9" r="1.2"/>',
+  chart:'<line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="12" width="3" height="6"/><rect x="11" y="8" width="3" height="10"/><rect x="16" y="4" width="3" height="14"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  cloud:'<path d="M7 18a4 4 0 0 1 0-8 5 5 0 0 1 9.6-1.6A4 4 0 0 1 17 18z"/>',
+  trophy:'<path d="M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/><path d="M10 14h4v3h-4zM8 20h8"/>',
+  check:'<polyline points="20 6 9 17 4 12"/>',
+};
+function icon(name,cls=""){ return `<svg class="icon ${cls}" viewBox="0 0 24 24">${ICONS[name]||ICONS.box}</svg>`; }
+function outNode(node,cls=""){ const d=document.createElement("div"); d.className="ln"+(cls?" "+cls:""); d.appendChild(node); term.appendChild(d); scroll(); return d; }
+function el(tag,cls,html){ const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
 
 /* ---------- fs helpers ---------- */
 function nodeAt(segs){ let n=state.fs; for(const s of segs){ if(n&&typeof n==="object"&&s in n) n=n[s]; else return undefined; } return n; }
@@ -205,11 +344,13 @@ function def(name,desc,run,usage){ C[name]={desc,run,usage}; }
 def("help","muestra la ayuda",(a)=>{
   if(a[0]&&C[a[0]]){ const c=C[a[0]]; out(a[0]+" — "+c.desc,"accent"); if(c.usage) out("uso: "+c.usage,"muted"); return; }
   const cats={
-    "shell":["help","man","clear","exit","reboot","history","alias","unalias","export","env","which","type","echo","printf","repeat","sleep"],
+    "shell":["help","man","clear","exit","reboot","setup","reset","history","alias","unalias","export","env","which","type","echo","printf","repeat","sleep"],
     "archivos":["ls","cd","pwd","cat","tac","head","tail","tree","find","grep","wc","stat","du","mkdir","rmdir","touch","rm","mv","cp","edit","nano"],
     "texto":["rev","upper","lower","sort","uniq","nl","tr","base64","rot13","hash","uuid","urlencode","urldecode","json","morse","password","seq","cal"],
     "sistema":["neofetch","whoami","uname","hostname","uptime","date","free","df","ps","top","battery","theme"],
     "dev":["git"],
+    "nube":["wall","save","load","paste","getpaste","rank","stats"],
+    "visual":["chart","plot","gauge","progress","button","card","table","palette","color","icon","icons","clock","dashboard"],
     "red":["ping","traceroute","ifconfig","speedtest"],
     "diversion":["figlet","banner","cowsay","cowthink","lolcat","fortune","matrix","sl","hack","8ball","dice","coin","roll","rps","guess","joke","yes"],
   };
@@ -228,8 +369,10 @@ def("man","manual de un comando",(a)=>{
   out(a[0],"accent"); out("  "+c.desc,"muted"); if(c.usage) out("  uso: "+c.usage,"faint");
 });
 def("clear","limpia la pantalla",()=>{ term.innerHTML=""; });
-def("exit","cierra la sesion (reinicia)",()=>{ term.innerHTML=""; boot(); });
-def("reboot","reinicia la terminal",()=>{ term.innerHTML=""; boot(); });
+def("exit","cierra la sesion (reinicia)",()=>{ restart(); });
+def("reboot","reinicia la terminal",()=>{ restart(); });
+def("setup","reabre el asistente de configuracion",async()=>{ await runWizard(); out("✓ configuracion guardada","ok"); renderPrompt(); scroll(); });
+def("reset","borra los datos locales de la terminal",()=>{ try{localStorage.removeItem(LS);}catch{} out("datos locales borrados. recarga la pagina para empezar de cero.","warn"); });
 def("history","historial de comandos",(a,stdin)=>{
   return state.hist.map((h,i)=>"  "+String(i+1).padStart(3)+"  "+h).join("\n");
 });
@@ -478,6 +621,130 @@ def("git","control de versiones (sandbox, sobre el FS virtual)",(a)=>{
   }
 },"git init | status | add . | commit -m \"msg\" | log | branch | checkout -b dev");
 
+/* --- visual / generativos (renderizan dentro de la terminal) --- */
+function accent(){ return getComputedStyle(document.documentElement).getPropertyValue("--accent-bright").trim()||"#c084fc"; }
+def("chart","grafico de barras inline",(a)=>{
+  const vals=a.join(" ").split(/[\s,]+/).map(Number).filter(v=>!isNaN(v));
+  if(!vals.length) return out("uso: chart 3 7 2 9 5","warn");
+  const W=Math.min(60+vals.length*44,460),H=140,pad=24,max=Math.max(...vals,1),bw=(W-pad)/vals.length*0.62;
+  let bars="";
+  vals.forEach((v,i)=>{ const h=(v/max)*(H-40); const x=pad+i*((W-pad)/vals.length);
+    bars+=`<rect x="${x}" y="${H-20-h}" width="${bw}" height="${h}" rx="3" fill="${accent()}" style="animation-delay:${i*60}ms"/>`;
+    bars+=`<text class="val" x="${x+bw/2}" y="${H-24-h}" text-anchor="middle">${v}</text>`;
+    bars+=`<text class="lbl" x="${x+bw/2}" y="${H-6}" text-anchor="middle">${i+1}</text>`; });
+  outNode(el("div","nxt-widget",`<svg class="chart-svg" width="${W}" height="${H}">${bars}</svg>`));
+},"chart 3 7 2 9 5");
+def("plot","dibuja una funcion f(x)",(a)=>{
+  const expr=(a.join(" ")||"sin(x)").replace(/\^/g,"**");
+  let f; try{ f=new Function("x","with(Math){return ("+expr+")}"); f(0); }catch{ return out("plot: expresion invalida","err"); }
+  const W=460,H=170,N=180; let pts=[],min=Infinity,max=-Infinity,ys=[];
+  for(let i=0;i<=N;i++){ const x=-10+(20*i/N); let y=f(x); if(!isFinite(y))y=null; ys.push(y); if(y!=null){min=Math.min(min,y);max=Math.max(max,y);} }
+  if(min===max){min-=1;max+=1;}
+  ys.forEach((y,i)=>{ if(y==null)return; const px=(i/N)*W; const py=H-((y-min)/(max-min))*(H-16)-8; pts.push((pts.length?"L":"M")+px.toFixed(1)+" "+py.toFixed(1)); });
+  const svg=`<svg class="chart-svg" width="${W}" height="${H}"><line x1="0" y1="${H/2}" x2="${W}" y2="${H/2}" stroke="#2a1c3a"/><path d="${pts.join(" ")}" fill="none" stroke="${accent()}" stroke-width="2"/></svg>`;
+  outNode(el("div","nxt-widget",`<div class="faint" style="font-size:11px">f(x) = ${esc(a.join(" ")||"sin(x)")}</div>${svg}`));
+},"plot sin(x)*x/3");
+def("gauge","medidor circular (0-100)",(a)=>{
+  const v=Math.max(0,Math.min(100,parseInt(a[0])||0)); const r=52,c=2*Math.PI*r,off=c*(1-v/100);
+  outNode(el("div","nxt-widget",`<svg class="gauge-svg" width="130" height="130" viewBox="0 0 130 130">
+    <circle cx="65" cy="65" r="${r}" fill="none" stroke="#241834" stroke-width="12"/>
+    <circle cx="65" cy="65" r="${r}" fill="none" stroke="${accent()}" stroke-width="12" stroke-linecap="round"
+      stroke-dasharray="${c}" stroke-dashoffset="${off}" transform="rotate(-90 65 65)" style="transition:stroke-dashoffset .8s ease"/>
+    <text x="65" y="72" text-anchor="middle" fill="#fff" font="700 26px monospace" font-size="26" font-weight="700">${v}%</text></svg>`));
+},"gauge 72");
+def("progress","barra de progreso animada",(a)=>{
+  const target=Math.max(0,Math.min(100,parseInt(a[0])||100));
+  const bar=el("div","nxt-widget",`<div style="width:300px;max-width:80vw;height:12px;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:#0a0710"><div style="height:100%;width:0;background:linear-gradient(90deg,var(--accent-dim),var(--accent-bright));transition:width 1.2s ease"></div></div><div class="faint" style="font-size:11px;margin-top:4px">0%</div>`);
+  outNode(bar); const fill=bar.querySelector("div>div"),lbl=bar.querySelector(".faint");
+  requestAnimationFrame(()=>{ fill.style.width=target+"%"; let n=0; const iv=setInterval(()=>{ n+=Math.ceil(target/40); if(n>=target){n=target;clearInterval(iv);} lbl.textContent=n+"%"; },30); });
+},"progress 80");
+def("button","crea un boton clicable que ejecuta un comando",(a)=>{
+  if(!a.length) return out('uso: button "Etiqueta" comando  (ej: button "Info" neofetch)',"warn");
+  const label=a[0], cmd=a.slice(1).join(" ")||"neofetch";
+  const b=el("button","nxt-btn",icon("zap")+" "+esc(label));
+  b.addEventListener("click",async()=>{ echoCommand(cmd); await exec(cmd); renderPrompt(); scroll(); });
+  outNode(b);
+},'button "Ver info" neofetch');
+def("card","tarjeta con titulo :: cuerpo",(a)=>{
+  const parts=a.join(" ").split("::"); const t=(parts[0]||"NXT27").trim(), body=(parts.slice(1).join("::")||"").trim();
+  outNode(el("div","nxt-card",`<div class="hd">${icon("box")}<b>${esc(t)}</b></div><div class="bd">${esc(body)}</div>`));
+},"card Titulo :: contenido");
+def("table","tabla: filas con / y columnas con ,",(a)=>{
+  const rows=a.join(" ").split("/").map(r=>r.split(",").map(c=>c.trim()));
+  if(!rows.length||!rows[0].length) return out("uso: table a,b,c / 1,2,3","warn");
+  let h="<table class='nxt-table'>"; rows.forEach((r,i)=>{ h+="<tr>"+r.map(c=>`<${i?"td":"th"}>${esc(c)}</${i?"td":"th"}>`).join("")+"</tr>"; }); h+="</table>";
+  outNode(el("div","nxt-widget",h));
+},"table Nombre,Rol / Neo,Admin / Trinity,Op");
+def("palette","muestra la paleta del tema actual",()=>{
+  const names=[["--accent","accent"],["--accent-bright","bright"],["--accent-dim","dim"],["--ok","ok"],["--warn","warn"],["--err","err"],["--info","info"]];
+  const cs=getComputedStyle(document.documentElement);
+  outNode(el("div","nxt-widget",names.map(([v,n])=>{const c=cs.getPropertyValue(v).trim();return `<span class="swatch-chip"><i style="background:${c}"></i>${n} <span class="faint">${c}</span></span>`;}).join(" ")));
+},"palette");
+def("color","muestra un color",(a)=>{
+  const c=a[0]||accent();
+  outNode(el("div","nxt-widget",`<span class="swatch-chip"><i style="width:28px;height:28px;background:${esc(c)}"></i><b>${esc(c)}</b></span>`));
+},"color #a855f7");
+def("icon","muestra un icono",(a)=>{ if(!a[0])return out("iconos: "+Object.keys(ICONS).join(" "),"faint"); outNode(el("span","nxt-widget",`<span style="font-size:40px;color:${accent()}">${icon(a[0])}</span>`)); },"icon rocket");
+def("icons","lista los iconos disponibles",()=>{ outNode(el("div","nxt-widget",Object.keys(ICONS).map(n=>`<span style="display:inline-block;text-align:center;margin:6px;width:60px"><span style="font-size:26px;color:${accent()}">${icon(n)}</span><br><span class="faint" style="font-size:10px">${n}</span></span>`).join(""))); });
+def("clock","reloj digital en vivo",()=>{
+  const w=el("div","nxt-widget widget-clock","00:00:00"); outNode(w);
+  const upd=()=>{ if(!w.isConnected)return clearInterval(iv); w.textContent=new Date().toTimeString().slice(0,8); };
+  const iv=setInterval(upd,1000); upd();
+});
+def("dashboard","panel de demostracion (varios widgets)",()=>{
+  outHTML(`<b>${icon("chart")} NXT27 · panel de demo</b>`);
+  C.card.run(["Sistema","::","NXT27 v2.0 — terminal web con comandos reales, nube y widgets."]);
+  C.chart.run(["5","9","3","11","7","12"]);
+  C.gauge.run(["76"]);
+  const row=el("div","nxt-widget");
+  ["neofetch","palette","stats","wall"].forEach(cmd=>{ const b=el("button","nxt-btn",icon("zap")+" "+cmd); b.addEventListener("click",async()=>{echoCommand(cmd);await exec(cmd);renderPrompt();scroll();}); row.appendChild(b); });
+  outNode(row);
+});
+
+/* --- nube (Supabase) --- */
+def("wall","muro global: lee o publica (compartido entre todos)",async(a)=>{
+  if(a.length){ await sb("wall_post",{name:USER,body:a.join(" ")}); return out("✓ publicado en el muro global","ok"); }
+  out("· cargando muro...","faint");
+  const {messages}=await sb("wall_list",{limit:20});
+  if(!messages.length) return out("(muro vacio — se el primero: wall hola a todos)","faint");
+  messages.forEach(m=>outHTML(`<span class="faint">${new Date(m.created_at).toTimeString().slice(0,5)}</span> ${icon("ghost")} <span class="accent">${esc(m.user_name)}</span>  ${esc(m.body)}`));
+},"wall [mensaje]");
+def("save","guarda tu terminal en la nube y da un codigo",async(a)=>{
+  const data={fs:state.fs,aliases:state.aliases,env:state.env,theme:state.theme,username:state.username};
+  const {code}=await sb("save",{code:a[0]||undefined,data});
+  out("✓ guardado en la nube","ok"); outHTML(`  codigo: <b style="font-size:16px">${code}</b>`); out("  recupera con: load "+code,"faint");
+},"save [codigo]");
+def("load","restaura tu terminal desde la nube",async(a)=>{
+  if(!a[0]) return out("uso: load CODIGO","warn");
+  const {data}=await sb("load",{code:a[0]});
+  if(data.fs)state.fs=data.fs; if(data.aliases)state.aliases=data.aliases; if(data.env)state.env=data.env;
+  if(data.theme){state.theme=data.theme;applyTheme(data.theme);} if(data.username){state.username=data.username;USER=data.username;}
+  state.cwd=[]; save(); out("✓ terminal restaurada desde "+a[0].toUpperCase(),"ok");
+},"load CODIGO");
+def("paste","sube texto o un archivo y da un codigo para compartir",async(a,stdin)=>{
+  let content=stdin;
+  if(a.length){ const n=nodeAt(resolve(a[0])); content= typeof n==="string"? n : a.join(" "); }
+  if(!content) return out("uso: paste <texto|archivo>  o  cat f | paste","warn");
+  const {code}=await sb("paste_create",{content});
+  out("✓ subido","ok"); outHTML(`  codigo: <b style="font-size:16px">${code}</b>`); out("  recupera con: getpaste "+code,"faint");
+},"paste <texto|archivo>");
+def("getpaste","descarga un paste por su codigo",async(a)=>{
+  if(!a[0]) return out("uso: getpaste CODIGO","warn");
+  const {content}=await sb("paste_get",{code:a[0]}); return content;
+},"getpaste CODIGO");
+def("rank","ranking global del juego guess",async()=>{
+  const {scores}=await sb("score_list",{game:"guess",order:"asc",limit:10});
+  if(!scores.length) return out("(sin puntuaciones todavia — juega 'guess')","faint");
+  outHTML(`<b>${icon("trophy")} RANKING · guess</b> <span class="faint">(menos intentos gana)</span>`);
+  scores.forEach((s,i)=>out(`  ${String(i+1).padStart(2)}.  ${String(s.user_name).padEnd(16)}  ${s.score} intentos`));
+},"rank");
+def("stats","estadisticas globales de NXT27",async()=>{
+  const s=await sb("stats");
+  outHTML(`<b>${icon("globe")} NXT27 en la nube</b>`);
+  out("  visitas:   "+s.visits); out("  mensajes:  "+s.messages);
+  out("  guardados: "+s.saves);  out("  pastes:    "+s.pastes);
+},"stats");
+
 /* interactive apps (not pipeable) */
 def("guess","adivina el numero (juego)",()=>{ guessGame(); });
 def("matrix","lluvia matrix (tecla para salir)",()=> matrixApp());
@@ -497,8 +764,10 @@ async function runStage(cmdStr, stdin){
   if(state.aliases[name]){ toks=tokenize(state.aliases[name]).concat(toks.slice(1)); name=toks[0].toLowerCase(); }
   const cmd=C[name];
   if(!cmd){ out(name+": comando no encontrado — escribe 'help'","err"); return undefined; }
-  const res=cmd.run(toks.slice(1), stdin, {});
-  return (res&&typeof res.then==="function")? await res : res;
+  try{
+    const res=cmd.run(toks.slice(1), stdin, {});
+    return (res&&typeof res.then==="function")? await res : res;
+  }catch(e){ out(name+": "+(e&&e.message?e.message:e),"err"); return undefined; }
 }
 
 async function exec(line, record=true){
@@ -619,7 +888,7 @@ document.getElementById("inputRow").addEventListener("submit",async e=>{
   echoCommand(v);
   // guess game capture
   if(guessState&&/^\d+$/.test(v.trim())){ const g=parseInt(v.trim()); guessState.tries++;
-    if(g===guessState.target){ out(`¡Correcto! en ${guessState.tries} intentos 🎉`,"ok"); guessState=null; }
+    if(g===guessState.target){ out(`¡Correcto! en ${guessState.tries} intentos 🎉`,"ok"); const t=guessState.tries; sb("score_submit",{game:"guess",name:USER,score:t}).then(()=>out("✓ puntuacion enviada al ranking (rank)","faint")).catch(()=>{}); guessState=null; }
     else out(g<guessState.target?"Mas alto ↑":"Mas bajo ↓","warn");
     renderPrompt(); scroll(); return;
   }
@@ -652,19 +921,66 @@ setInterval(()=>{ clkEl.textContent=new Date().toTimeString().slice(0,8); },1000
 /* ============================================================
    BOOT
    ============================================================ */
-function boot(){
-  applyTheme(state.theme);
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+async function bootSequence(quick){
+  const b=document.getElementById("boot"); b.style.display="flex";
+  document.getElementById("bootLogo").textContent=LOGO;
+  const log=document.getElementById("bootLog"), fill=document.getElementById("bootFill"), pct=document.getElementById("bootPct");
+  log.innerHTML=""; fill.style.width="0%"; pct.textContent="0%";
+  const steps=["init neural core","montando sistema de archivos","cargando "+Object.keys(C).length+" modulos","conectando con la nube NXT27","aplicando tema "+state.theme,"preparando interfaz"];
+  const d = (quick||!state.effects) ? 70 : 240;
+  for(let i=0;i<steps.length;i++){
+    const line=el("div",null,`<span class="faint">[ ] ${steps[i]}…</span>`); log.appendChild(line);
+    await sleep(d);
+    line.innerHTML=`<span class="ok">[✓]</span> ${steps[i]}`;
+    const p=Math.round(((i+1)/steps.length)*100); fill.style.width=p+"%"; pct.textContent=p+"%";
+  }
+  await sleep(quick?120:300);
+  b.style.display="none";
+}
+
+function runWizard(){
+  return new Promise(resolve=>{
+    const wz=document.getElementById("wizard"), sw=document.getElementById("wSwatches"),
+          nm=document.getElementById("wName"), eff=document.getElementById("wEffects"), go=document.getElementById("wGo");
+    wz.style.display="flex";
+    nm.value = (state.username && state.username!=="neural") ? state.username : "";
+    const palette=["violet","matrix","dracula","nord","synthwave","cyberpunk","amber","ocean","blood"];
+    sw.innerHTML="";
+    palette.forEach(name=>{ const col=THEMES[name][1]; const s=el("div","swatch"+(name===state.theme?" sel":"")); s.style.background=col; s.style.color=col; s.title=name;
+      s.addEventListener("click",()=>{ sw.querySelectorAll(".swatch").forEach(x=>x.classList.remove("sel")); s.classList.add("sel"); applyTheme(name); });
+      sw.appendChild(s); });
+    eff.querySelectorAll(".wopt").forEach(o=>{ o.classList.toggle("sel",(o.dataset.v==="on")===state.effects);
+      o.addEventListener("click",()=>{ eff.querySelectorAll(".wopt").forEach(x=>x.classList.remove("sel")); o.classList.add("sel"); state.effects=o.dataset.v==="on"; applyEffects(); }); });
+    const finish=()=>{ state.username=(nm.value.trim()||"neural").slice(0,18); USER=state.username; save(); wz.style.display="none"; resolve(); };
+    go.onclick=finish;
+    nm.onkeydown=(e)=>{ if(e.key==="Enter") finish(); };
+    nm.focus();
+  });
+}
+
+function termBanner(){
   outHTML(`<span class="logo">${esc(LOGO)}</span>`);
   out("");
-  outHTML(`<span class="accent">Neural eXecution Terminal</span> <span class="faint">v2.0 · ${Object.keys(C).length} comandos</span>`);
-  out("Terminal web ultra completa — comandos reales, pipes, temas y mas. Todo offline.","muted");
-  outHTML(`Escribe <b>help</b> · prueba <b>neofetch</b> · <b>figlet NXT27 | lolcat</b> · <b>fortune | cowsay</b> · <b>matrix</b>`,"muted");
+  outHTML(`<span class="accent">Neural eXecution Terminal</span> <span class="faint">v2.0 · ${Object.keys(C).length} comandos · nube activa</span>`);
+  outHTML(`Hola <b>${esc(USER)}</b> 👋 — escribe <b>help</b> para ver todo.`,"muted");
+  outHTML(`Prueba: <b>dashboard</b> · <b>chart 5 9 3 11</b> · <b>wall hola</b> · <b>figlet NXT | lolcat</b> · <b>matrix</b>`,"muted");
   out("");
   renderPrompt(); scroll();
 }
-/* measure char width for ghost alignment: monospace, same font -> ghost uses same box, so just overlay full text */
-boot();
-input.focus();
+
+async function restart(){ term.innerHTML=""; await bootSequence(true); termBanner(); input.focus(); }
+
+async function startup(){
+  applyTheme(state.theme); applyEffects();
+  await bootSequence(state.setupDone);
+  if(!state.setupDone){ await runWizard(); state.setupDone=true; save(); }
+  termBanner();
+  sb("visit").catch(()=>{}); // cuenta la apertura (silencioso)
+  input.focus();
+}
+startup();
 </script>
 </body>
 </html>
