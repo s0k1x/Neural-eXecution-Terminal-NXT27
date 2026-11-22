@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NXT27 Terminal</title>
-<meta name="description" content="Neural eXecution Terminal NXT27 — terminal web funcional con estética hacker.">
+<meta name="description" content="Neural eXecution Terminal NXT27 — terminal web ultra completa con estética hacker.">
 <style>
 :root{
   --bg:#050308;--panel:#0a0710;--line:#241834;--line-soft:#160f22;
   --accent:#a855f7;--accent-bright:#c084fc;--accent-dim:#6d28d9;
   --txt:#d9d2ea;--txt-dim:#8b82a0;--txt-faint:#564d6e;
-  --ok:#4ade80;--warn:#e3b341;--err:#f87171;
+  --ok:#4ade80;--warn:#e3b341;--err:#f87171;--info:#60a5fa;
   --glow:0 0 8px rgba(168,85,247,.5);
 }
 *{box-sizing:border-box}
@@ -18,52 +18,43 @@ html,body{margin:0;height:100%}
 body{
   background:var(--bg);color:var(--txt);
   font-family:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  font-size:14px;line-height:1.55;height:100dvh;overflow:hidden;
-  -webkit-font-smoothing:antialiased;
+  font-size:14px;line-height:1.5;height:100dvh;overflow:hidden;-webkit-font-smoothing:antialiased;
 }
-/* subtle backdrop */
 body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(900px 500px at 50% -8%,rgba(109,40,217,.16),transparent 60%),
-    repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,.25) 3px 4px);
-  opacity:.7}
+  background:radial-gradient(900px 500px at 50% -8%,rgba(109,40,217,.15),transparent 60%),
+    repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,.22) 3px 4px);opacity:.7}
 #app{position:relative;z-index:1;display:flex;flex-direction:column;height:100dvh}
-
-.bar{display:flex;align-items:center;gap:10px;padding:8px 14px;
-  background:#08050d;border-bottom:1px solid var(--line-soft);font-size:12px;color:var(--txt-dim)}
+.bar{display:flex;align-items:center;gap:10px;padding:8px 14px;background:#08050d;
+  border-bottom:1px solid var(--line-soft);font-size:12px;color:var(--txt-dim)}
 .bar .hex{width:11px;height:11px;transform:rotate(45deg);background:var(--accent-bright);box-shadow:var(--glow)}
 .bar b{color:var(--txt);font-weight:700;letter-spacing:1px}
-.bar .spacer{flex:1}
-.bar .dot{width:9px;height:9px;border:1px solid var(--line);border-radius:50%}
+.bar .spacer{flex:1}.bar .dot{width:9px;height:9px;border:1px solid var(--line);border-radius:50%}
 .bar .clk{color:var(--txt-faint)}
-
-#term{flex:1;overflow-y:auto;padding:14px 16px 90px;scroll-behavior:smooth;
-  background:linear-gradient(180deg,rgba(168,85,247,.015),transparent 120px)}
-#term::-webkit-scrollbar{width:8px}
-#term::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
-
+#term{flex:1;overflow-y:auto;padding:12px 16px 20px;scroll-behavior:smooth}
+#term::-webkit-scrollbar{width:8px}#term::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
 .ln{white-space:pre-wrap;word-break:break-word}
-.muted{color:var(--txt-dim)}
-.faint{color:var(--txt-faint)}
-.accent{color:var(--accent-bright)}
-.ok{color:var(--ok)}.warn{color:var(--warn)}.err{color:var(--err)}
+.muted{color:var(--txt-dim)}.faint{color:var(--txt-faint)}.accent{color:var(--accent-bright)}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.err{color:var(--err)}.info{color:var(--info)}
 .ln b{color:var(--accent-bright);font-weight:700}
-.logo{color:var(--accent-bright);text-shadow:var(--glow);line-height:1.15;font-size:13px}
-
-/* input row (also used in-flow for echoed history) */
-.row{display:flex;align-items:flex-start;gap:0;white-space:pre-wrap}
+.logo{color:var(--accent-bright);text-shadow:var(--glow);line-height:1.12}
+.row{display:flex;white-space:pre-wrap;word-break:break-word}
 .ps1{color:var(--accent-bright);white-space:pre}
-.ps1 .host{color:var(--accent)}
-.ps1 .path{color:var(--txt)}
-
-#inputRow{position:sticky;bottom:0;display:flex;align-items:center;gap:0;
-  padding:10px 16px;background:linear-gradient(180deg,transparent,var(--bg) 30%);
-  border-top:1px solid var(--line-soft)}
-#cmd{flex:1;background:transparent;border:0;outline:0;color:var(--txt);
-  font:inherit;caret-color:var(--accent-bright);padding:0;margin:0}
-#cmd::placeholder{color:var(--txt-faint)}
-
+.ps1 .host{color:var(--accent)}.ps1 .path{color:var(--txt)}
+#inputRow{position:sticky;bottom:0;display:flex;align-items:center;padding:9px 16px;
+  background:linear-gradient(180deg,transparent,var(--bg) 35%);border-top:1px solid var(--line-soft)}
+#inWrap{position:relative;flex:1;display:flex}
+#cmd{flex:1;background:transparent;border:0;outline:0;color:var(--txt);font:inherit;
+  caret-color:var(--accent-bright);padding:0;margin:0;position:relative;z-index:2}
+#ghost{position:absolute;left:0;top:0;color:var(--txt-faint);pointer-events:none;white-space:pre;z-index:1}
 a{color:var(--accent-bright)}
+/* overlays */
+#overlay{position:fixed;inset:0;z-index:50;display:none;background:#000}
+#overlay canvas{width:100%;height:100%;display:block}
+#editor{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;background:var(--bg)}
+#editor .eh{display:flex;gap:14px;align-items:center;padding:8px 14px;background:#08050d;border-bottom:1px solid var(--line-soft);font-size:12px;color:var(--txt-dim)}
+#editor .eh b{color:var(--accent-bright)}
+#editor textarea{flex:1;background:transparent;border:0;outline:0;color:var(--txt);font:inherit;padding:14px 16px;resize:none;line-height:1.5}
+.kbd{border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--txt);font-size:11px}
 </style>
 </head>
 <body>
@@ -75,86 +66,74 @@ a{color:var(--accent-bright)}
     <span class="dot"></span><span class="dot"></span><span class="dot"></span>
     <span class="clk" id="clk">--:--:--</span>
   </div>
-
   <div id="term" aria-live="polite"></div>
-
   <form id="inputRow" autocomplete="off">
     <span class="ps1" id="ps1"></span>
-    <input id="cmd" name="cmd" autocomplete="off" autocapitalize="off"
-           autocorrect="off" spellcheck="false" aria-label="comando" />
+    <span id="inWrap">
+      <input id="cmd" name="cmd" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="comando"/>
+      <span id="ghost"></span>
+    </span>
   </form>
+</div>
+
+<div id="overlay"><canvas id="ocanvas"></canvas></div>
+<div id="editor">
+  <div class="eh"><b id="edName"></b><span class="spacer" style="flex:1"></span>
+    <span><span class="kbd">Ctrl+S</span> guardar</span><span><span class="kbd">Esc</span> salir</span></div>
+  <textarea id="edArea" spellcheck="false"></textarea>
 </div>
 
 <script>
 "use strict";
-const term = document.getElementById("term");
-const input = document.getElementById("cmd");
-const ps1El = document.getElementById("ps1");
-const clkEl = document.getElementById("clk");
+/* ============================================================
+   NXT27 Terminal — ultra complete web shell
+   ============================================================ */
+const term=document.getElementById("term"), input=document.getElementById("cmd"),
+      ghost=document.getElementById("ghost"), ps1El=document.getElementById("ps1"), clkEl=document.getElementById("clk");
+const USER="neural", HOST="NXT-27", started=Date.now();
+const LS="nxt27.state";
 
-const USER = "neural", HOST = "NXT-27";
-const started = Date.now();
-
-/* ---------- virtual filesystem ---------- */
-const FS = {
-  "readme.txt": "NXT27 — Neural eXecution Terminal\nTerminal web con estetica. Escribe 'help' para ver comandos.",
-  "about.txt": "Demo con toque visual y comandos reales (offline, en tu navegador).",
-  proyectos: {
-    "nxt27.md": "# NXT27\nterminal + .exe + web. Hecho para divertirse.",
-    "ideas.txt": "- temas de color\n- mas comandos\n- mini-juegos"
-  },
-  logs: { "boot.log": "[ok] kernel\n[ok] display\n[ok] shell" }
+/* ---------- persistent state ---------- */
+let state={ fs:null, cwd:[], hist:[], aliases:{}, env:{USER:"neural",HOST:"NXT-27",SHELL:"nxt-sh",HOME:"~"}, theme:"violet" };
+const DEFAULT_FS={
+  "readme.txt":"NXT27 — Neural eXecution Terminal\nTerminal web ultra completa. Escribe 'help'.\nPrueba: neofetch · figlet HOLA · fortune | cowsay | lolcat · matrix",
+  "about.txt":"Terminal con comandos reales, pipes, temas, editor y mas. Todo offline.",
+  proyectos:{ "nxt27.md":"# NXT27\nterminal + .exe + web.", "ideas.txt":"- mas temas\n- mini juegos\n- editor" },
+  docs:{ "comandos.txt":"Escribe help para la lista completa." },
+  logs:{ "boot.log":"[ok] kernel\n[ok] display\n[ok] net\n[ok] shell" }
 };
-let cwd = []; // path segments from root
-
-function nodeAt(segs){
-  let n = FS;
-  for(const s of segs){ if(n && typeof n==="object" && s in n) n=n[s]; else return undefined; }
-  return n;
+function load(){
+  try{ const s=JSON.parse(localStorage.getItem(LS)); if(s){ Object.assign(state,s); } }catch{}
+  if(!state.fs) state.fs=structuredClone(DEFAULT_FS);
+  if(!state.env) state.env={};
 }
-function cwdLabel(){ return "~" + (cwd.length? "/"+cwd.join("/") : ""); }
+function save(){ try{ localStorage.setItem(LS,JSON.stringify(state)); }catch{} }
+load();
+
+/* ---------- fs helpers ---------- */
+function nodeAt(segs){ let n=state.fs; for(const s of segs){ if(n&&typeof n==="object"&&s in n) n=n[s]; else return undefined; } return n; }
+function parentOf(segs){ return nodeAt(segs.slice(0,-1)); }
+function cwdLabel(){ return "~"+(state.cwd.length?"/"+state.cwd.join("/"):""); }
 function resolve(path){
-  // returns new segment array or null
-  let segs = (path.startsWith("/")||path.startsWith("~")) ? [] : cwd.slice();
-  for(const part of path.replace(/^~\/?/,"").split("/")){
-    if(part===""||part===".") continue;
-    if(part===".."){ segs.pop(); continue; }
+  let segs=(path[0]==="/"||path[0]==="~")?[]:state.cwd.slice();
+  for(const part of path.replace(/^~\/?/,"").replace(/^\//,"").split("/")){
+    if(part===""||part===".")continue;
+    if(part===".."){segs.pop();continue;}
     segs.push(part);
-  }
-  return segs;
+  } return segs;
 }
 
-/* ---------- output helpers ---------- */
-function out(text="", cls=""){
-  const d=document.createElement("div");
-  d.className="ln"+(cls?" "+cls:"");
-  d.textContent=text;
-  term.appendChild(d);
-}
-function outHTML(html, cls=""){
-  const d=document.createElement("div");
-  d.className="ln"+(cls?" "+cls:"");
-  d.innerHTML=html;
-  term.appendChild(d);
-}
-function echoCommand(line){
-  const d=document.createElement("div");
-  d.className="row";
-  d.innerHTML=`<span class="ps1">${ps1HTML()}</span>`;
-  const c=document.createElement("span");
-  c.textContent=line;
-  d.appendChild(c);
-  term.appendChild(d);
-}
-function scroll(){ term.scrollTop=term.scrollHeight; }
-
-function ps1HTML(){
-  return `<span class="host">${USER}@${HOST}</span>:<span class="path">${cwdLabel()}</span>$ `;
-}
+/* ---------- output ---------- */
+function out(text="",cls=""){ const d=document.createElement("div"); d.className="ln"+(cls?" "+cls:""); d.textContent=text; term.appendChild(d); return d; }
+function outHTML(html,cls=""){ const d=document.createElement("div"); d.className="ln"+(cls?" "+cls:""); d.innerHTML=html; term.appendChild(d); return d; }
+function ps1HTML(){ return `<span class="host">${USER}@${HOST}</span>:<span class="path">${cwdLabel()}</span>$ `; }
 function renderPrompt(){ ps1El.innerHTML=ps1HTML(); }
+function echoCommand(line){ const d=document.createElement("div"); d.className="row"; d.innerHTML=`<span class="ps1">${ps1HTML()}</span>`; const c=document.createElement("span"); c.textContent=line; d.appendChild(c); term.appendChild(d); }
+function scroll(){ term.scrollTop=term.scrollHeight; }
+const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 
-/* ---------- commands ---------- */
-const LOGO = String.raw`
+/* ---------- ascii ---------- */
+const LOGO=String.raw`
  ███╗   ██╗██╗  ██╗████████╗██████╗ ███████╗
  ████╗  ██║╚██╗██╔╝╚══██╔══╝╚════██╗╚════██║
  ██╔██╗ ██║ ╚███╔╝    ██║    █████╔╝    ██╔╝
@@ -162,215 +141,425 @@ const LOGO = String.raw`
  ██║ ╚████║██╔╝ ██╗   ██║   ███████╗   ██║
  ╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝   ╚══════╝   ╚═╝`;
 
-const THEMES = {
-  violet:["#a855f7","#c084fc","#6d28d9"],
-  cyan:  ["#22d3ee","#67e8f9","#0891b2"],
-  green: ["#22c55e","#4ade80","#15803d"],
-  amber: ["#f59e0b","#fbbf24","#b45309"],
-  red:   ["#ef4444","#f87171","#b91c1c"],
-  pink:  ["#ec4899","#f9a8d4","#be185d"],
+/* 5-row block font for figlet */
+const FONT={
+ A:["█▀█","█▀█","▀ ▀"],B:["█▀▄","█▀▄","▀▀ "],C:["█▀▀","█  ","▀▀▀"],D:["█▀▄","█ █","▀▀ "],
+ E:["█▀▀","█▀▀","▀▀▀"],F:["█▀▀","█▀▀","▀  "],G:["█▀▀","█ █","▀▀▀"],H:["█ █","█▀█","▀ ▀"],
+ I:["█","█","▀"],J:["  █","  █","▀▀ "],K:["█ █","█▀▄","▀ ▀"],L:["█  ","█  ","▀▀▀"],
+ M:["█▄█","█▀█","▀ ▀"],N:["█▄█","█▀█","▀ ▀"],O:["█▀█","█ █","▀▀▀"],P:["█▀█","█▀▀","▀  "],
+ Q:["█▀█","█ █","▀▀█"],R:["█▀█","█▀▄","▀ ▀"],S:["█▀▀","▀▀█","▀▀▀"],T:["▀█▀"," █ "," ▀ "],
+ U:["█ █","█ █","▀▀▀"],V:["█ █","█ █"," ▀ "],W:["█ █","█▀█","▀ ▀"],X:["█ █"," █ ","▀ ▀"],
+ Y:["█ █"," █ "," ▀ "],Z:["▀▀█"," █ ","▀▀▀"],
+ "0":["█▀█","█ █","▀▀▀"],"1":["▀█ "," █ ","▀▀▀"],"2":["▀▀█","█▀▀","▀▀▀"],"3":["▀▀█","▀▀█","▀▀▀"],
+ "4":["█ █","▀▀█","  ▀"],"5":["█▀▀","▀▀█","▀▀▀"],"6":["█▀▀","█▀█","▀▀▀"],"7":["▀▀█","  █","  ▀"],
+ "8":["█▀█","█▀█","▀▀▀"],"9":["█▀█","▀▀█","▀▀▀"]," ":["  ","  ","  "],"!":["█","█","▀"],"?":["▀█","▄▀"," ▀"],".":[" "," ","▀"],"-":["   ","▀▀▀","   "]
 };
-
-const COMMANDS = {
-  help(){
-    out("Comandos disponibles:","accent");
-    const list=[
-      ["help","esta ayuda"],["clear","limpia la pantalla"],
-      ["echo <txt>","imprime texto"],["whoami","usuario actual"],
-      ["date","fecha y hora"],["uptime","tiempo encendido"],
-      ["ls [ruta]","lista archivos"],["cd <ruta>","cambia de carpeta"],
-      ["pwd","ruta actual"],["cat <archivo>","muestra un archivo"],
-      ["tree","arbol de archivos"],["mkdir <n>","crea carpeta"],
-      ["touch <n>","crea archivo"],["rm <n>","borra"],
-      ["calc <expr>","calculadora (2+2*3)"],["neofetch","info del sistema"],
-      ["banner","logo NXT27"],["theme <color>","cambia color"],
-      ["history","historial"],["about","sobre esto"],["exit","reinicia"],
-    ];
-    const w=Math.max(...list.map(c=>c[0].length));
-    for(const [c,d] of list) out("  "+c.padEnd(w+2)+" "+d,"muted");
-    out("");
-    out("Atajos: ↑/↓ historial · Tab autocompletar · Ctrl+L limpiar","faint");
-  },
-  clear(){ term.innerHTML=""; },
-  echo(args){ out(args.join(" ")); },
-  whoami(){ out(USER); },
-  date(){ out(new Date().toString()); },
-  uptime(){
-    const s=Math.floor((Date.now()-started)/1000);
-    const m=Math.floor(s/60), h=Math.floor(m/60);
-    out(`activo ${h}h ${m%60}m ${s%60}s`);
-  },
-  pwd(){ out("/"+cwd.join("/")); },
-  ls(args){
-    const target = args[0] ? resolve(args[0]) : cwd;
-    const n = nodeAt(target);
-    if(n===undefined) return out("ls: no existe: "+args[0],"err");
-    if(typeof n==="string") return out(args[0]);
-    const keys=Object.keys(n);
-    if(!keys.length) return out("(vacio)","faint");
-    for(const k of keys){
-      const dir = typeof n[k]==="object";
-      outHTML(`  <span class="${dir?'accent':''}">${k}${dir?'/':''}</span>`);
-    }
-  },
-  cd(args){
-    if(!args[0]||args[0]==="~"){ cwd=[]; return; }
-    const segs=resolve(args[0]);
-    const n=nodeAt(segs);
-    if(n===undefined) return out("cd: no existe: "+args[0],"err");
-    if(typeof n!=="object") return out("cd: no es una carpeta: "+args[0],"err");
-    cwd=segs;
-  },
-  cat(args){
-    if(!args[0]) return out("uso: cat <archivo>","warn");
-    const n=nodeAt(resolve(args[0]));
-    if(n===undefined) return out("cat: no existe: "+args[0],"err");
-    if(typeof n==="object") return out("cat: es una carpeta","err");
-    out(n);
-  },
-  tree(){
-    const walk=(n,pre)=>{
-      const keys=Object.keys(n);
-      keys.forEach((k,i)=>{
-        const last=i===keys.length-1, dir=typeof n[k]==="object";
-        outHTML(pre+(last?"└─ ":"├─ ")+`<span class="${dir?'accent':''}">${k}${dir?'/':''}</span>`);
-        if(dir) walk(n[k],pre+(last?"   ":"│  "));
-      });
-    };
-    outHTML("<span class='accent'>~/</span>");
-    walk(nodeAt(cwd),"");
-  },
-  mkdir(args){
-    if(!args[0]) return out("uso: mkdir <nombre>","warn");
-    const p=nodeAt(cwd); if(args[0] in p) return out("ya existe","err");
-    p[args[0]]={};
-  },
-  touch(args){
-    if(!args[0]) return out("uso: touch <nombre>","warn");
-    const p=nodeAt(cwd); if(!(args[0] in p)) p[args[0]]="";
-  },
-  rm(args){
-    if(!args[0]) return out("uso: rm <nombre>","warn");
-    const p=nodeAt(cwd);
-    if(!(args[0] in p)) return out("rm: no existe","err");
-    delete p[args[0]];
-  },
-  calc(args){
-    const expr=args.join(" ");
-    if(!/^[-0-9.+*/%()\s]+$/.test(expr)) return out("calc: solo numeros y + - * / % ( )","err");
-    try{ const r=Function('"use strict";return ('+expr+')')(); out(String(r),"ok"); }
-    catch{ out("calc: expresion invalida","err"); }
-  },
-  banner(){ out(LOGO,"logo"); },
-  about(){
-    out("NXT27 · Neural eXecution Terminal","accent");
-    out("Terminal web con toque visual. Comandos reales, offline.","muted");
-    out("Codigo: github.com/s0k1x/Neural-eXecution-Terminal-NXT27","faint");
-  },
-  neofetch(){
-    const ua=navigator.userAgent;
-    const os = /Windows/.test(ua)?"Windows": /Android/.test(ua)?"Android":
-               /iPhone|iPad|iOS/.test(ua)?"iOS": /Mac/.test(ua)?"macOS":
-               /Linux/.test(ua)?"Linux":"Desconocido";
-    const br = /Edg/.test(ua)?"Edge": /Chrome/.test(ua)?"Chrome":
-               /Firefox/.test(ua)?"Firefox": /Safari/.test(ua)?"Safari":"Navegador";
-    const info=[
-      [USER+"@"+HOST.toLowerCase(),""],
-      ["os",os],["shell","nxt-sh 1.0"],["host",br],
-      ["res",`${screen.width}x${screen.height} @${window.devicePixelRatio||1}x`],
-      ["cpu",(navigator.hardwareConcurrency||"?")+" hilos"],
-      ["mem",(navigator.deviceMemory? navigator.deviceMemory+" GB":"n/d")],
-      ["lang",navigator.language||"?"],
-      ["uptime",Math.floor((Date.now()-started)/1000)+"s"],
-    ];
-    const logo=LOGO.split("\n").filter(Boolean);
-    const rows=Math.max(logo.length,info.length);
-    for(let i=0;i<rows;i++){
-      const l=(logo[i]||"").padEnd(46);
-      let r="";
-      if(info[i]){
-        r = info[i][1]==="" ? `<b>${info[i][0]}</b>` : `<span class="accent">${info[i][0]}</span> ${info[i][1]}`;
-      }
-      outHTML(`<span class="logo">${l.replace(/ /g,"&nbsp;")}</span>${r}`);
-    }
-  },
-  theme(args){
-    const t=args[0];
-    if(!t||!THEMES[t]){ out("temas: "+Object.keys(THEMES).join(", "),"warn"); return; }
-    const [a,b,c]=THEMES[t];
-    const r=document.documentElement.style;
-    r.setProperty("--accent",a);r.setProperty("--accent-bright",b);r.setProperty("--accent-dim",c);
-    out("tema → "+t,"ok");
-  },
-  history(){ hist.forEach((h,i)=>out("  "+String(i+1).padStart(3)+"  "+h,"muted")); },
-  exit(){ term.innerHTML=""; boot(); },
-};
-const ALIASES={cls:"clear","?":"help",dir:"ls",clr:"clear"};
-
-/* ---------- runner ---------- */
-let hist=[], hi=-1;
-function run(line){
-  const trimmed=line.trim();
-  echoCommand(line);
-  if(trimmed){
-    hist.push(trimmed); hi=hist.length;
-    const parts=trimmed.match(/(?:[^\s"]+|"[^"]*")+/g).map(s=>s.replace(/"/g,""));
-    let cmd=parts[0].toLowerCase(); const args=parts.slice(1);
-    if(ALIASES[cmd]) cmd=ALIASES[cmd];
-    if(COMMANDS[cmd]){ try{ COMMANDS[cmd](args); }catch(e){ out("error: "+e.message,"err"); } }
-    else out(cmd+": comando no encontrado — escribe 'help'","err");
-  }
-  renderPrompt(); scroll();
+function figlet(text){
+  text=text.toUpperCase(); const rows=["","",""];
+  for(const ch of text){ const g=FONT[ch]||FONT["?"]; for(let i=0;i<3;i++) rows[i]+=g[i]+" "; }
+  return rows.join("\n");
 }
 
-/* ---------- autocomplete ---------- */
+/* ---------- themes ---------- */
+const THEMES={
+ violet:["#a855f7","#c084fc","#6d28d9","#050308"],
+ matrix:["#22c55e","#4ade80","#15803d","#010501"],
+ dracula:["#bd93f9","#ff79c6","#6272a4","#282a36"],
+ nord:["#88c0d0","#8fbcbb","#5e81ac","#2e3440"],
+ synthwave:["#f92aad","#ff8b00","#9d4edd","#1a0b2e"],
+ cyberpunk:["#00f0ff","#fcee0a","#ff003c","#0a0a12"],
+ amber:["#f59e0b","#fbbf24","#b45309","#0a0702"],
+ ocean:["#38bdf8","#7dd3fc","#0369a1","#041016"],
+ mono:["#d4d4d4","#ffffff","#737373","#0a0a0a"],
+ blood:["#ef4444","#f87171","#991b1b","#0a0303"],
+};
+function applyTheme(name){
+  const t=THEMES[name]; if(!t) return false;
+  const r=document.documentElement.style;
+  r.setProperty("--accent",t[0]); r.setProperty("--accent-bright",t[1]);
+  r.setProperty("--accent-dim",t[2]); r.setProperty("--bg",t[3]);
+  state.theme=name; save(); return true;
+}
+
+/* ---------- lolcat ---------- */
+function lolcatHTML(str){
+  let h=""; let i=0;
+  for(const ch of str){
+    if(ch==="\n"){h+="\n";continue;}
+    const hue=(i*8)%360; h+=`<span style="color:hsl(${hue},90%,70%)">${esc(ch)}</span>`; i++;
+  } return h;
+}
+
+/* ---------- input helpers for pipes ---------- */
+function toLines(s){ return s===undefined?[]:String(s).replace(/\n$/,"").split("\n"); }
+
+/* ============================================================
+   COMMAND REGISTRY
+   Each: {desc, usage?, run(args, stdin, ctx) -> string | undefined}
+   Returning a string = stdout (pipeable). undefined = interactive.
+   ============================================================ */
+const C={};
+function def(name,desc,run,usage){ C[name]={desc,run,usage}; }
+
+/* --- core/shell --- */
+def("help","muestra la ayuda",(a)=>{
+  if(a[0]&&C[a[0]]){ const c=C[a[0]]; out(a[0]+" — "+c.desc,"accent"); if(c.usage) out("uso: "+c.usage,"muted"); return; }
+  const cats={
+    "shell":["help","man","clear","exit","reboot","history","alias","unalias","export","env","which","type","echo","printf","repeat","sleep"],
+    "archivos":["ls","cd","pwd","cat","tac","head","tail","tree","find","grep","wc","stat","du","mkdir","rmdir","touch","rm","mv","cp","edit","nano"],
+    "texto":["rev","upper","lower","sort","uniq","nl","tr","base64","rot13","hash","uuid","urlencode","urldecode","json","morse","password","seq","cal"],
+    "sistema":["neofetch","whoami","uname","hostname","uptime","date","free","df","ps","top","battery","theme"],
+    "red":["ping","traceroute","ifconfig","speedtest"],
+    "diversion":["figlet","banner","cowsay","cowthink","lolcat","fortune","matrix","sl","hack","8ball","dice","coin","roll","rps","guess","joke","yes"],
+  };
+  out(""); outHTML(`<span class="accent">NXT27</span> <span class="faint">— ${Object.keys(C).length} comandos</span>`);
+  for(const [cat,list] of Object.entries(cats)){
+    out("");
+    outHTML(`<b>▸ ${cat}</b>`);
+    out("  "+list.filter(x=>C[x]).join("  "),"muted");
+  }
+  out("");
+  outHTML(`Detalle: <b>man &lt;cmd&gt;</b> · Pipes: <b>echo hola | cowsay | lolcat</b> · Redir: <b>echo x &gt; f.txt</b>`,"faint");
+  out("Atajos: ↑/↓ historial · → acepta sugerencia · Tab autocompleta · Ctrl+L limpia","faint");
+});
+def("man","manual de un comando",(a)=>{
+  const c=C[a[0]]; if(!c) return out("man: sin entrada para "+(a[0]||""),"err");
+  out(a[0],"accent"); out("  "+c.desc,"muted"); if(c.usage) out("  uso: "+c.usage,"faint");
+});
+def("clear","limpia la pantalla",()=>{ term.innerHTML=""; });
+def("exit","cierra la sesion (reinicia)",()=>{ term.innerHTML=""; boot(); });
+def("reboot","reinicia la terminal",()=>{ term.innerHTML=""; boot(); });
+def("history","historial de comandos",(a,stdin)=>{
+  return state.hist.map((h,i)=>"  "+String(i+1).padStart(3)+"  "+h).join("\n");
+});
+def("alias","crea o lista alias",(a)=>{
+  if(!a.length){ return Object.entries(state.aliases).map(([k,v])=>`${k}='${v}'`).join("\n")||out("(sin alias)","faint"); }
+  const m=a.join(" ").match(/^(\w+)=(.+)$/); if(!m) return out("uso: alias nombre='comando'","warn");
+  state.aliases[m[1]]=m[2].replace(/^['"]|['"]$/g,""); save();
+},"alias ll='ls -l'");
+def("unalias","elimina un alias",(a)=>{ delete state.aliases[a[0]]; save(); });
+def("export","define variable de entorno",(a)=>{
+  const m=a.join(" ").match(/^(\w+)=(.*)$/); if(!m) return out("uso: export VAR=valor","warn");
+  state.env[m[1]]=m[2].replace(/^['"]|['"]$/g,""); save();
+},"export NOMBRE=valor");
+def("env","muestra variables de entorno",()=> Object.entries(state.env).map(([k,v])=>k+"="+v).join("\n"));
+C.printenv=C.env;
+def("which","localiza un comando",(a)=> C[a[0]]? "/bin/"+a[0] : out(a[0]+" no encontrado","err"));
+def("type","tipo de comando",(a)=> C[a[0]]? a[0]+" es un comando integrado" : (state.aliases[a[0]]? a[0]+" es alias de '"+state.aliases[a[0]]+"'" : out("no encontrado","err")));
+def("echo","imprime texto",(a,stdin)=> a.join(" "));
+def("printf","imprime con formato",(a)=> a.join(" ").replace(/\\n/g,"\n").replace(/\\t/g,"\t"));
+def("repeat","repite un comando N veces",async(a)=>{ const n=parseInt(a[0]); if(!n) return out("uso: repeat N comando","warn"); const rest=a.slice(1).join(" "); for(let i=0;i<Math.min(n,50);i++) await exec(rest,false); },"repeat 3 echo hola");
+def("sleep","espera N segundos",async(a)=>{ const n=Math.min(parseFloat(a[0])||1,5); await new Promise(r=>setTimeout(r,n*1000)); });
+
+/* --- filesystem --- */
+def("ls","lista archivos",(a)=>{
+  const flags=a.filter(x=>x[0]==="-").join(""); const rest=a.filter(x=>x[0]!=="-");
+  const target=rest[0]?resolve(rest[0]):state.cwd; const n=nodeAt(target);
+  if(n===undefined) return out("ls: no existe: "+rest[0],"err");
+  if(typeof n==="string") return rest[0];
+  let keys=Object.keys(n); if(!flags.includes("a")) keys=keys.filter(k=>k[0]!==".");
+  if(!keys.length) return out("(vacio)","faint");
+  if(flags.includes("l")){
+    for(const k of keys){ const dir=typeof n[k]==="object"; const sz=dir?"-":String(n[k].length);
+      outHTML(`<span class="faint">${dir?"d":"-"}rw-r--r--  ${sz.padStart(5)}  </span><span class="${dir?'accent':''}">${esc(k)}${dir?"/":""}</span>`); }
+    return;
+  }
+  outHTML(keys.map(k=>{const dir=typeof n[k]==="object";return `<span class="${dir?'accent':''}">${esc(k)}${dir?"/":""}</span>`;}).join("   "));
+},"ls -la [ruta]");
+def("cd","cambia de carpeta",(a)=>{
+  if(!a[0]||a[0]==="~"){ state.cwd=[]; save(); return; }
+  const segs=resolve(a[0]); const n=nodeAt(segs);
+  if(n===undefined) return out("cd: no existe: "+a[0],"err");
+  if(typeof n!=="object") return out("cd: no es carpeta: "+a[0],"err");
+  state.cwd=segs; save();
+});
+def("pwd","ruta actual",()=> "/"+state.cwd.join("/"));
+def("cat","muestra archivos",(a,stdin)=>{
+  if(!a.length) return stdin??"";
+  let r=[]; for(const f of a){ const n=nodeAt(resolve(f)); if(n===undefined){out("cat: no existe: "+f,"err");continue;} if(typeof n==="object"){out("cat: es carpeta: "+f,"err");continue;} r.push(n); }
+  return r.join("\n");
+});
+def("tac","muestra invertido por lineas",(a,stdin)=>{ const src=a.length?(nodeAt(resolve(a[0]))||""):stdin||""; return toLines(src).reverse().join("\n"); });
+def("head","primeras lineas",(a,stdin)=>{ let n=10,files=a.filter(x=>{if(/^-\d+$/.test(x)){n=+x.slice(1);return false;}return true;}); const src=files.length?(nodeAt(resolve(files[0]))||""):stdin||""; return toLines(src).slice(0,n).join("\n"); },"head -5 archivo");
+def("tail","ultimas lineas",(a,stdin)=>{ let n=10,files=a.filter(x=>{if(/^-\d+$/.test(x)){n=+x.slice(1);return false;}return true;}); const src=files.length?(nodeAt(resolve(files[0]))||""):stdin||""; return toLines(src).slice(-n).join("\n"); });
+def("tree","arbol de archivos",()=>{
+  const lines=[]; const walk=(n,pre)=>{ const ks=Object.keys(n); ks.forEach((k,i)=>{ const last=i===ks.length-1,dir=typeof n[k]==="object";
+    lines.push(pre+(last?"└─ ":"├─ ")+k+(dir?"/":"")); if(dir) walk(n[k],pre+(last?"   ":"│  ")); }); };
+  out("."); walk(nodeAt(state.cwd),""); lines.forEach(l=>out(l));
+});
+def("find","busca archivos por nombre",(a)=>{
+  const q=a[0]||""; const res=[]; const walk=(n,path)=>{ for(const k of Object.keys(n)){ const p=path+"/"+k; if(k.includes(q)) res.push("."+p); if(typeof n[k]==="object") walk(n[k],p); } };
+  walk(nodeAt(state.cwd),""); return res.join("\n")||out("(sin resultados)","faint");
+},"find nombre");
+def("grep","filtra lineas que contienen",(a,stdin)=>{
+  let flags=a.filter(x=>x[0]==="-").join(""); let rest=a.filter(x=>x[0]!=="-");
+  const pat=rest[0]||""; const src=rest[1]?(nodeAt(resolve(rest[1]))||""):stdin||"";
+  const ic=flags.includes("i");
+  return toLines(src).filter(l=> ic? l.toLowerCase().includes(pat.toLowerCase()) : l.includes(pat)).join("\n");
+},"grep patron [archivo]");
+def("wc","cuenta lineas/palabras/caracteres",(a,stdin)=>{ const src=a[0]?(nodeAt(resolve(a[0]))||""):stdin||""; const l=toLines(src); const w=src.trim()?src.trim().split(/\s+/).length:0; return `  ${l.length} lineas  ${w} palabras  ${src.length} caracteres`; });
+def("stat","informacion de un archivo",(a)=>{ const n=nodeAt(resolve(a[0]||"")); if(n===undefined) return out("stat: no existe","err"); const dir=typeof n==="object"; return `nombre: ${a[0]}\ntipo:   ${dir?"carpeta":"archivo"}\ntamano: ${dir?Object.keys(n).length+" entradas":n.length+" bytes"}`; });
+def("du","uso aproximado",()=>{ let b=0; const walk=n=>{ for(const k of Object.keys(n)){ if(typeof n[k]==="object") walk(n[k]); else b+=n[k].length; } }; walk(nodeAt(state.cwd)); return `  ${b} bytes en ${cwdLabel()}`; });
+def("mkdir","crea carpeta",(a)=>{ if(!a[0]) return out("uso: mkdir nombre","warn"); const p=nodeAt(state.cwd); if(a[0] in p) return out("ya existe","err"); p[a[0]]={}; save(); });
+def("rmdir","borra carpeta vacia",(a)=>{ const p=nodeAt(state.cwd); const n=p[a[0]]; if(typeof n!=="object") return out("no es carpeta","err"); if(Object.keys(n).length) return out("carpeta no vacia","err"); delete p[a[0]]; save(); });
+def("touch","crea archivo vacio",(a)=>{ if(!a[0]) return out("uso: touch nombre","warn"); const p=nodeAt(state.cwd); if(!(a[0] in p)) p[a[0]]=""; save(); });
+def("rm","borra archivos",(a)=>{ const rec=a.includes("-r")||a.includes("-rf"); const rest=a.filter(x=>x[0]!=="-"); const p=nodeAt(state.cwd); for(const f of rest){ if(!(f in p)){out("rm: no existe: "+f,"err");continue;} if(typeof p[f]==="object"&&!rec){out("rm: es carpeta (usa -r): "+f,"err");continue;} delete p[f]; } save(); },"rm [-r] archivo");
+def("mv","mueve/renombra",(a)=>{ const p=nodeAt(state.cwd); if(a.length<2||!(a[0] in p)) return out("uso: mv origen destino","warn"); p[a[1]]=p[a[0]]; delete p[a[0]]; save(); });
+def("cp","copia",(a)=>{ const p=nodeAt(state.cwd); if(a.length<2||!(a[0] in p)) return out("uso: cp origen destino","warn"); p[a[1]]=structuredClone(p[a[0]]); save(); });
+def("edit","editor de texto",(a)=>{ if(!a[0]) return out("uso: edit archivo","warn"); openEditor(a[0]); });
+C.nano=C.edit;
+
+/* --- text/utils --- */
+def("rev","invierte cada linea",(a,stdin)=>{ const src=a.length?a.join(" "):stdin||""; return toLines(src).map(l=>[...l].reverse().join("")).join("\n"); });
+def("upper","a mayusculas",(a,stdin)=> (a.length?a.join(" "):stdin||"").toUpperCase());
+def("lower","a minusculas",(a,stdin)=> (a.length?a.join(" "):stdin||"").toLowerCase());
+def("sort","ordena lineas",(a,stdin)=>{ const src=a.length&&a[0][0]!=="-"?(nodeAt(resolve(a[0]))||""):stdin||""; let L=toLines(src).sort(); if(a.includes("-r"))L.reverse(); return L.join("\n"); });
+def("uniq","elimina duplicados contiguos",(a,stdin)=>{ const L=toLines(stdin||""); return L.filter((l,i)=>l!==L[i-1]).join("\n"); });
+def("nl","numera lineas",(a,stdin)=>{ const src=a.length?(nodeAt(resolve(a[0]))||""):stdin||""; return toLines(src).map((l,i)=>String(i+1).padStart(4)+"  "+l).join("\n"); });
+def("tr","sustituye caracteres",(a,stdin)=>{ if(a.length<2) return stdin||""; const [from,to]=a; let s=stdin||""; let r=""; for(const ch of s){ const idx=from.indexOf(ch); r+= idx>=0&&to[idx]?to[idx]:ch; } return r; },"echo hola | tr a-o A-O");
+def("base64","codifica/decodifica base64",(a,stdin)=>{ const dec=a.includes("-d"); const rest=a.filter(x=>x[0]!=="-"); const src=rest.length?rest.join(" "):stdin||""; try{ return dec? decodeURIComponent(escape(atob(src))) : btoa(unescape(encodeURIComponent(src))); }catch{ return out("base64: entrada invalida","err"); } },"base64 [-d] texto");
+def("rot13","cifrado rot13",(a,stdin)=>{ const src=a.length?a.join(" "):stdin||""; return src.replace(/[a-z]/gi,c=>String.fromCharCode((c<="Z"?90:122)>=(c=c.charCodeAt(0)+13)?c:c-26)); });
+def("hash","hash SHA-256",async(a,stdin)=>{ const src=a.length?a.join(" "):stdin||""; const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(src)); return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join(""); },"hash texto");
+def("uuid","genera un UUID v4",()=> (crypto.randomUUID?crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==="x"?r:(r&0x3|0x8)).toString(16);})));
+def("urlencode","codifica URL",(a,stdin)=> encodeURIComponent(a.length?a.join(" "):stdin||""));
+def("urldecode","decodifica URL",(a,stdin)=>{ try{ return decodeURIComponent(a.length?a.join(" "):stdin||""); }catch{ return out("entrada invalida","err"); } });
+def("json","formatea/valida JSON",(a,stdin)=>{ const src=a.length?a.join(" "):stdin||""; try{ return JSON.stringify(JSON.parse(src),null,2); }catch(e){ return out("json: invalido — "+e.message,"err"); } });
+def("morse","texto a codigo morse",(a,stdin)=>{ const M={A:".-",B:"-...",C:"-.-.",D:"-..",E:".",F:"..-.",G:"--.",H:"....",I:"..",J:".---",K:"-.-",L:".-..",M:"--",N:"-.",O:"---",P:".--.",Q:"--.-",R:".-.",S:"...",T:"-",U:"..-",V:"...-",W:".--",X:"-..-",Y:"-.--",Z:"--..","0":"-----","1":".----","2":"..---","3":"...--","4":"....-","5":".....","6":"-....","7":"--...","8":"---..","9":"----.",".":".-.-.-",",":"--..--","?":"..--.."," ":"/"}; return (a.length?a.join(" "):stdin||"").toUpperCase().split("").map(c=>M[c]||"").join(" "); });
+def("password","genera una contrasena",(a)=>{ const n=Math.min(parseInt(a[0])||16,64); const ch="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*?"; let p=""; const arr=crypto.getRandomValues(new Uint32Array(n)); for(let i=0;i<n;i++)p+=ch[arr[i]%ch.length]; return p; },"password [longitud]");
+def("seq","secuencia de numeros",(a)=>{ let s=1,e=parseInt(a[0])||10; if(a.length>1){s=parseInt(a[0]);e=parseInt(a[1]);} let r=[]; for(let i=s;i<=e;i++)r.push(i); return r.join("\n"); },"seq [inicio] fin");
+def("cal","calendario del mes",()=>{ const d=new Date(),y=d.getFullYear(),m=d.getMonth(); const first=new Date(y,m,1).getDay(); const days=new Date(y,m+1,0).getDate(); const mn=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"][m]; let s="    "+mn+" "+y+"\nLu Ma Mi Ju Vi Sa Do\n"; let wd=(first+6)%7; s+="   ".repeat(wd); for(let dd=1;dd<=days;dd++){ s+=String(dd).padStart(2)+" "; if((wd+dd)%7===0)s+="\n"; } return s; });
+
+/* --- system --- */
+def("neofetch","informacion del sistema",()=>{
+  const ua=navigator.userAgent;
+  const os=/Windows/.test(ua)?"Windows":/Android/.test(ua)?"Android":/iPhone|iPad|iOS/.test(ua)?"iOS":/Mac/.test(ua)?"macOS":/Linux/.test(ua)?"Linux":"?";
+  const br=/Edg/.test(ua)?"Edge":/Chrome/.test(ua)?"Chrome":/Firefox/.test(ua)?"Firefox":/Safari/.test(ua)?"Safari":"?";
+  const info=[[USER+"@"+HOST.toLowerCase(),""],["os",os],["shell","nxt-sh 1.0"],["host",br],
+    ["res",`${screen.width}x${screen.height} @${window.devicePixelRatio||1}x`],
+    ["cpu",(navigator.hardwareConcurrency||"?")+" hilos"],["mem",(navigator.deviceMemory?navigator.deviceMemory+" GB":"n/d")],
+    ["lang",navigator.language||"?"],["theme",state.theme],["uptime",Math.floor((Date.now()-started)/1000)+"s"]];
+  const logo=LOGO.split("\n").filter(Boolean); const rows=Math.max(logo.length,info.length);
+  for(let i=0;i<rows;i++){ const l=(logo[i]||"").padEnd(46); let r=""; if(info[i]) r= info[i][1]===""?`<b>${info[i][0]}</b>`:`<span class="accent">${info[i][0]}</span> ${esc(info[i][1])}`;
+    outHTML(`<span class="logo">${esc(l).replace(/ /g,"&nbsp;")}</span>${r}`); }
+});
+def("whoami","usuario actual",()=> USER);
+def("uname","informacion del kernel",(a)=> a.includes("-a")? "NXT27 neural 1.0 web x86_64 NeuralKernel":"NXT27");
+def("hostname","nombre del equipo",()=> HOST);
+def("uptime","tiempo encendido",()=>{ const s=Math.floor((Date.now()-started)/1000); return `activo ${Math.floor(s/3600)}h ${Math.floor(s/60)%60}m ${s%60}s`; });
+def("date","fecha y hora",()=> new Date().toString());
+def("free","memoria (simulada)",()=>"              total     usado     libre\nMem:          16384      8211      8173\nSwap:          4096       512      3584");
+def("df","espacio en disco (simulado)",()=>"Sistema      Tamano  Usado  Disp  Uso%\n/dev/nxt0      256G    118G  138G   46%\ntmpfs           16G    1.2G   15G    8%");
+def("ps","procesos (simulado)",()=>"  PID  CMD\n    1  nxt-init\n   42  nxt-shell\n  128  display\n  256  neural-core\n  512  "+ (state.theme)+"-theme");
+def("top","monitor (simulado)",()=>{ out("tareas: 5 · cpu 12% · mem 50%","accent"); C.ps.run([]).split("\n").forEach(l=>out(l,"muted")); });
+def("battery","estado de la bateria",async()=>{ if(navigator.getBattery){ const b=await navigator.getBattery(); return `bateria: ${Math.round(b.level*100)}% ${b.charging?"(cargando)":""}`; } return "bateria: n/d"; });
+def("theme","cambia el tema de color",(a)=>{ if(!a[0]||a[0]==="list") return "temas: "+Object.keys(THEMES).join(", "); if(applyTheme(a[0])) out("tema → "+a[0],"ok"); else out("tema no encontrado. 'theme list'","err"); },"theme matrix");
+
+/* --- network (simulado) --- */
+def("ping","ping simulado",async(a)=>{ const host=a[0]||"nxt27.local"; out("PING "+host+" (10.0.0.1):","muted"); for(let i=0;i<4;i++){ await new Promise(r=>setTimeout(r,300)); out(`64 bytes de ${host}: icmp_seq=${i} ttl=64 tiempo=${(Math.random()*20+5).toFixed(1)} ms`,"ok"); } out("--- "+host+" estadisticas ---","muted"); out("4 paquetes transmitidos, 4 recibidos, 0% perdida","muted"); },"ping host");
+def("traceroute","ruta simulada",async(a)=>{ const host=a[0]||"nxt27.local"; out("traceroute a "+host,"muted"); const hops=["router.local","10.0.0.1","isp-gw.net","backbone-3.net",host]; for(let i=0;i<hops.length;i++){ await new Promise(r=>setTimeout(r,250)); out(` ${i+1}  ${hops[i]}  ${(Math.random()*30+2).toFixed(1)} ms`); } });
+def("ifconfig","interfaces de red (simulado)",()=>"nxt0: inet 10.0.0.27  netmask 255.255.255.0\n      inet6 fe80::n27  scope link\nlo:   inet 127.0.0.1   netmask 255.0.0.0");
+def("speedtest","test de velocidad simulado",async()=>{ out("midiendo...","muted"); await new Promise(r=>setTimeout(r,800)); out("↓ "+(Math.random()*500+100).toFixed(1)+" Mbps","ok"); await new Promise(r=>setTimeout(r,500)); out("↑ "+(Math.random()*100+20).toFixed(1)+" Mbps","ok"); out("ping "+(Math.random()*20+3).toFixed(0)+" ms","muted"); });
+
+/* --- fun --- */
+def("figlet","texto ASCII gigante",(a,stdin)=> figlet(a.length?a.join(" "):stdin||"NXT27"),"figlet HOLA");
+C.banner=C.figlet;
+def("cowsay","una vaca dice algo",(a,stdin)=>{ const t=(a.length?a.join(" "):stdin||"Muuu").replace(/\n/g," "); const top=" "+"_".repeat(t.length+2); const bot=" "+"-".repeat(t.length+2); return `${top}\n< ${t} >\n${bot}\n        \\   ^__^\n         \\  (oo)\\_______\n            (__)\\       )\\/\\\n                ||----w |\n                ||     ||`; });
+def("cowthink","una vaca piensa",(a,stdin)=>{ const t=(a.length?a.join(" "):stdin||"hmm").replace(/\n/g," "); const top=" "+"_".repeat(t.length+2); const bot=" "+"-".repeat(t.length+2); return `${top}\n( ${t} )\n${bot}\n        o   ^__^\n         o  (oo)\\_______\n            (__)\\       )\\/\\\n                ||----w |\n                ||     ||`; });
+def("lolcat","colorea el texto de arcoiris",(a,stdin)=>{ outHTML(lolcatHTML(a.length?a.join(" "):stdin||"NXT27")); },"figlet hola | lolcat");
+def("fortune","una frase al azar",()=>{ const f=["La mejor forma de predecir el futuro es programarlo.","Hay 10 tipos de personas: las que saben binario y las que no.","Un buen cafe compila mejor codigo.","El codigo es poesia... con bugs.","rm -rf es para siempre.","99 bugs en el codigo, corriges uno... 127 bugs en el codigo.","Nunca confies en un ordenador que no puedas tirar por la ventana.","El mejor mensaje de error es el que nunca ves.","Semper paratus: siempre un backup.","Primero resuelvelo, luego optimizalo."]; return f[Math.floor(Math.random()*f.length)]; });
+def("joke","un chiste de programador",()=>{ const j=["¿Por que los programadores confunden Halloween y Navidad? Porque OCT 31 = DEC 25.","Un SQL entra en un bar, se acerca a dos mesas y pregunta: ¿puedo unirme?","¿Cuantos programadores hacen falta para cambiar una bombilla? Ninguno, es un problema de hardware.","Hay dos cosas dificiles: invalidar cache, nombrar cosas y los errores off-by-one."]; return j[Math.floor(Math.random()*j.length)]; });
+def("8ball","la bola magica responde",(a)=>{ const r=["Sin duda","Es cierto","Probablemente si","Pregunta de nuevo","No cuentes con ello","Mi respuesta es no","Muy dudoso","Definitivamente si"]; return "🎱 "+r[Math.floor(Math.random()*r.length)]; },"8ball ¿lloguere?");
+def("dice","tira un dado",(a)=>{ const c=Math.min(parseInt(a[0])||1,10); let r=[]; for(let i=0;i<c;i++)r.push(Math.floor(Math.random()*6)+1); return "🎲 "+r.join(" ")+(c>1?"  (total "+r.reduce((x,y)=>x+y,0)+")":""); });
+def("coin","lanza una moneda",()=> Math.random()<.5?"🪙 cara":"🪙 cruz");
+def("roll","numero aleatorio 1-100",(a)=>{ const max=parseInt(a[0])||100; return "🎯 "+(Math.floor(Math.random()*max)+1); });
+def("yes","repite un texto",(a)=>{ const t=a.join(" ")||"y"; return Array(20).fill(t).join("\n"); });
+def("rps","piedra papel tijera",(a)=>{ const opts=["piedra","papel","tijera"]; const you=a[0]; if(!opts.includes(you)) return out("uso: rps piedra|papel|tijera","warn"); const cpu=opts[Math.floor(Math.random()*3)]; const win={piedra:"tijera",papel:"piedra",tijera:"papel"}; let res= you===cpu?"empate": win[you]===cpu?"ganas 🎉":"pierdes 💀"; return `tu: ${you} · cpu: ${cpu} → ${res}`; });
+
+/* interactive apps (not pipeable) */
+def("guess","adivina el numero (juego)",()=>{ guessGame(); });
+def("matrix","lluvia matrix (tecla para salir)",()=> matrixApp());
+def("sl","tren a vapor",()=> slApp());
+def("hack","animacion de hackeo",()=> hackApp());
+
+/* ============================================================
+   PIPELINE EXECUTION
+   ============================================================ */
+function expandVars(s){ return s.replace(/\$(\w+)/g,(m,k)=> state.env[k]!==undefined?state.env[k]:m); }
+function tokenize(s){ return (s.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g)||[]).map(t=>t.replace(/^['"]|['"]$/g,"")); }
+
+async function runStage(cmdStr, stdin){
+  let toks=tokenize(expandVars(cmdStr.trim())); if(!toks.length) return undefined;
+  let name=toks[0].toLowerCase();
+  // alias expansion (one level)
+  if(state.aliases[name]){ toks=tokenize(state.aliases[name]).concat(toks.slice(1)); name=toks[0].toLowerCase(); }
+  const cmd=C[name];
+  if(!cmd){ out(name+": comando no encontrado — escribe 'help'","err"); return undefined; }
+  const res=cmd.run(toks.slice(1), stdin, {});
+  return (res&&typeof res.then==="function")? await res : res;
+}
+
+async function exec(line, record=true){
+  const raw=line.trim(); if(!raw) return;
+  if(record){ state.hist.push(raw); if(state.hist.length>500)state.hist.shift(); save(); }
+  // split on ; (sequential) and && (stop on error-ish not tracked, treat as sequential)
+  const seqs=raw.split(/\s*;\s*|\s*&&\s*/);
+  for(let seg of seqs){
+    // redirection
+    let redir=null; const rm=seg.match(/\s(>>?)\s*(\S+)\s*$/);
+    if(rm){ redir={append:rm[1]===">>", file:rm[2]}; seg=seg.slice(0,rm.index); }
+    const stages=seg.split("|");
+    let data=undefined, printed=false;
+    for(let i=0;i<stages.length;i++){
+      const r=await runStage(stages[i], data);
+      if(i<stages.length-1){
+        if(typeof r!=="string"){ if(r===undefined){ /* interactive mid-pipe */ } data=""; }
+        else data=r;
+      }else{
+        if(typeof r==="string"){
+          if(redir){ writeFile(redir.file, redir.append, r); }
+          else if(r!==""){ r.split("\n").forEach(l=>out(l)); printed=true; }
+        }
+      }
+    }
+  }
+}
+function writeFile(name, append, content){
+  const segs=resolve(name); const parent=nodeAt(segs.slice(0,-1)); const key=segs[segs.length-1];
+  if(typeof parent!=="object"){ out("no se puede escribir: "+name,"err"); return; }
+  parent[key]= append&&typeof parent[key]==="string" ? parent[key]+"\n"+content : content; save();
+}
+
+/* ============================================================
+   INTERACTIVE APPS
+   ============================================================ */
+let appActive=null;
+function matrixApp(){
+  const ov=document.getElementById("overlay"), cv=document.getElementById("ocanvas"), ctx=cv.getContext("2d");
+  ov.style.display="block"; cv.width=innerWidth; cv.height=innerHeight;
+  const cols=Math.floor(cv.width/14); const drops=Array(cols).fill(1);
+  const ac=getComputedStyle(document.documentElement).getPropertyValue("--accent-bright")||"#c084fc";
+  let raf; function draw(){ ctx.fillStyle="rgba(0,0,0,.08)"; ctx.fillRect(0,0,cv.width,cv.height); ctx.fillStyle=ac; ctx.font="14px monospace";
+    for(let i=0;i<cols;i++){ const ch="01<>{}#*+=NXT27"[Math.floor(Math.random()*15)]; ctx.fillText(ch,i*14,drops[i]*14); if(drops[i]*14>cv.height&&Math.random()>.975)drops[i]=0; drops[i]++; } raf=requestAnimationFrame(draw); }
+  draw();
+  appActive=()=>{ cancelAnimationFrame(raf); ov.style.display="none"; appActive=null; renderPrompt(); input.focus(); };
+  out("(matrix activo — pulsa cualquier tecla para salir)","faint");
+}
+function slApp(){
+  const train=["      ====        ________                ___________","  _D _|  |_______/        \\__I_I_____===__|_________|"," |(_)---  |   H\\________/ |   |        =|___ ___|","/     |  |   H  |  |     |   |         ||_| |_||","|      |  |   H  |__--------------------| [___] |","| ________|___H__/__|_____/[][]~\\_______|       |","|/ |   |-----------I_____I [][] []  D   |=======|__"];
+  let pos=60, frames=0, maxw=train.reduce((m,l)=>Math.max(m,l.length),0);
+  const holder=train.map(()=>out(""));
+  const iv=setInterval(()=>{ pos-=2; frames++; train.forEach((l,i)=>{ holder[i].textContent=" ".repeat(Math.max(0,pos))+l; }); scroll(); if(pos< -maxw||frames>60){ clearInterval(iv); } },60);
+}
+function hackApp(){
+  out("INICIANDO SECUENCIA...","ok"); let n=0;
+  const words=["0x4F2A","ACCESO","bypass","0xDEADBEEF","root@core","injecting","decrypting","0x00FF","handshake","payload","kernel","0xCAFE","granted"];
+  const iv=setInterval(()=>{ let line=""; for(let i=0;i<6;i++)line+=words[Math.floor(Math.random()*words.length)]+" "; out(line, Math.random()<.2?"accent":"muted"); scroll(); if(++n>14){ clearInterval(iv); out("ACCESO CONCEDIDO ✓  (es broma, demo visual)","ok"); renderPrompt(); } },120);
+}
+function guessGame(){
+  const target=Math.floor(Math.random()*100)+1; let tries=0;
+  out("He pensado un numero del 1 al 100. Adivinalo (escribe un numero).","accent");
+  guessState={target,tries};
+}
+let guessState=null;
+
+/* ============================================================
+   EDITOR
+   ============================================================ */
+const edWrap=document.getElementById("editor"), edArea=document.getElementById("edArea"), edName=document.getElementById("edName");
+let edFile=null;
+function openEditor(name){ const segs=resolve(name); const parent=nodeAt(segs.slice(0,-1)); const key=segs[segs.length-1];
+  if(typeof parent!=="object"){ out("edit: ruta invalida","err"); return; }
+  if(!(key in parent)) parent[key]="";
+  if(typeof parent[key]==="object"){ out("edit: es carpeta","err"); return; }
+  edFile={parent,key}; edName.textContent=name; edArea.value=parent[key]; edWrap.style.display="flex"; edArea.focus();
+}
+edArea.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){ closeEditor(false); }
+  else if(e.key==="s"&&(e.ctrlKey||e.metaKey)){ e.preventDefault(); closeEditor(true); }
+});
+function closeEditor(saveIt){ if(saveIt&&edFile){ edFile.parent[edFile.key]=edArea.value; save(); out("guardado: "+edName.textContent,"ok"); renderPrompt(); } edWrap.style.display="none"; edFile=null; input.focus(); }
+
+/* ============================================================
+   INPUT / HISTORY / GHOST SUGGESTION / AUTOCOMPLETE
+   ============================================================ */
+let hi=-1;
+function updateGhost(){
+  const v=input.value;
+  if(!v){ ghost.textContent=""; return; }
+  // suggest from history (most recent match), else from command names
+  let s=null;
+  for(let i=state.hist.length-1;i>=0;i--){ if(state.hist[i].startsWith(v)&&state.hist[i]!==v){ s=state.hist[i]; break; } }
+  if(!s){ const cmds=Object.keys(C); const m=cmds.find(c=>c.startsWith(v)&&c!==v&&!v.includes(" ")); if(m)s=m; }
+  if(s){ ghost.dataset.full=s; ghost.innerHTML=`<span style="color:transparent">${esc(v)}</span>${esc(s.slice(v.length))}`; }
+  else { ghost.innerHTML=""; ghost.dataset.full=""; }
+}
+function acceptGhost(){ const full=ghost.dataset.full; if(full&&full.length>input.value.length){ input.value=full; updateGhost(); return true; } return false; }
+
 function complete(){
   const v=input.value, parts=v.split(" ");
   if(parts.length<=1){
-    const pool=[...Object.keys(COMMANDS),...Object.keys(ALIASES)];
-    const m=pool.filter(c=>c.startsWith(v));
+    const pool=[...Object.keys(C),...Object.keys(state.aliases)];
+    const m=[...new Set(pool)].filter(c=>c.startsWith(v));
     if(m.length===1) input.value=m[0]+" ";
-    else if(m.length>1){ echoCommand(v); out(m.join("  "),"faint"); scroll(); }
+    else if(m.length>1){ echoCommand(v); out(m.sort().join("  "),"faint"); scroll(); }
   }else{
-    const frag=parts[parts.length-1];
-    const n=nodeAt(cwd); if(typeof n!=="object") return;
+    const frag=parts[parts.length-1]; const n=nodeAt(state.cwd); if(typeof n!=="object")return;
     const m=Object.keys(n).filter(k=>k.startsWith(frag));
     if(m.length===1){ parts[parts.length-1]=m[0]+(typeof n[m[0]]==="object"?"/":""); input.value=parts.join(" "); }
     else if(m.length>1){ echoCommand(v); out(m.join("  "),"faint"); scroll(); }
   }
+  updateGhost();
 }
 
-/* ---------- events ---------- */
-document.getElementById("inputRow").addEventListener("submit",e=>{
-  e.preventDefault(); const v=input.value; input.value=""; run(v);
+document.getElementById("inputRow").addEventListener("submit",async e=>{
+  e.preventDefault(); const v=input.value; input.value=""; ghost.textContent="";
+  echoCommand(v);
+  // guess game capture
+  if(guessState&&/^\d+$/.test(v.trim())){ const g=parseInt(v.trim()); guessState.tries++;
+    if(g===guessState.target){ out(`¡Correcto! en ${guessState.tries} intentos 🎉`,"ok"); guessState=null; }
+    else out(g<guessState.target?"Mas alto ↑":"Mas bajo ↓","warn");
+    renderPrompt(); scroll(); return;
+  }
+  if(v.trim()){ await exec(v); }
+  renderPrompt(); scroll();
 });
+input.addEventListener("input",updateGhost);
 input.addEventListener("keydown",e=>{
-  if(e.key==="ArrowUp"){ e.preventDefault(); if(hi>0){hi--;input.value=hist[hi]||"";} }
-  else if(e.key==="ArrowDown"){ e.preventDefault(); if(hi<hist.length-1){hi++;input.value=hist[hi]||"";} else {hi=hist.length;input.value="";} }
-  else if(e.key==="Tab"){ e.preventDefault(); complete(); }
-  else if(e.key==="l"&&e.ctrlKey){ e.preventDefault(); COMMANDS.clear(); }
-  else if(e.key==="c"&&e.ctrlKey){ echoCommand(input.value+"^C"); input.value=""; renderPrompt(); scroll(); }
-});
-// keep focus; tap anywhere focuses input (mobile keyboard)
-term.addEventListener("click",()=>{ if(!getSelection().toString()) input.focus(); });
-document.getElementById("app").addEventListener("click",e=>{
-  if(e.target.closest(".bar")) return;
-  if(!getSelection().toString()) input.focus();
+  if(e.key==="ArrowUp"){ e.preventDefault(); if(hi===-1)hi=state.hist.length; if(hi>0){hi--;input.value=state.hist[hi]||"";updateGhost();} }
+  else if(e.key==="ArrowDown"){ e.preventDefault(); if(hi>=0&&hi<state.hist.length-1){hi++;input.value=state.hist[hi]||"";} else {hi=-1;input.value="";} updateGhost(); }
+  else if(e.key==="ArrowRight"){ if(input.selectionStart===input.value.length){ if(acceptGhost()) e.preventDefault(); } }
+  else if(e.key==="Tab"){ e.preventDefault(); if(!acceptGhost()) complete(); }
+  else if(e.key==="l"&&e.ctrlKey){ e.preventDefault(); term.innerHTML=""; }
+  else if(e.key==="c"&&e.ctrlKey){ echoCommand(input.value+"^C"); input.value=""; ghost.textContent=""; guessState=null; renderPrompt(); scroll(); }
+  else if(e.key==="u"&&e.ctrlKey){ e.preventDefault(); input.value=""; updateGhost(); }
+  else { hi=-1; }
 });
 
-/* ---------- clock ---------- */
+/* global key to exit matrix overlay */
+window.addEventListener("keydown",e=>{ if(appActive){ e.preventDefault(); appActive(); } });
+document.getElementById("overlay").addEventListener("click",()=>{ if(appActive)appActive(); });
+
+/* focus handling */
+term.addEventListener("click",()=>{ if(!getSelection().toString())input.focus(); });
+document.getElementById("app").addEventListener("click",e=>{ if(e.target.closest(".bar"))return; if(!getSelection().toString())input.focus(); });
+
+/* clock */
 setInterval(()=>{ clkEl.textContent=new Date().toTimeString().slice(0,8); },1000);
 
-/* ---------- boot ---------- */
+/* ============================================================
+   BOOT
+   ============================================================ */
 function boot(){
-  out(LOGO,"logo");
+  applyTheme(state.theme);
+  outHTML(`<span class="logo">${esc(LOGO)}</span>`);
   out("");
-  outHTML(`<span class="accent">Neural eXecution Terminal</span> <span class="faint">v1.0</span>`);
-  out("Terminal web — comandos reales, sin conexion.","muted");
-  outHTML(`Escribe <b>help</b> para empezar · prueba <b>neofetch</b>, <b>calc 7*6</b>, <b>theme cyan</b>`,"muted");
+  outHTML(`<span class="accent">Neural eXecution Terminal</span> <span class="faint">v2.0 · ${Object.keys(C).length} comandos</span>`);
+  out("Terminal web ultra completa — comandos reales, pipes, temas y mas. Todo offline.","muted");
+  outHTML(`Escribe <b>help</b> · prueba <b>neofetch</b> · <b>figlet NXT27 | lolcat</b> · <b>fortune | cowsay</b> · <b>matrix</b>`,"muted");
   out("");
   renderPrompt(); scroll();
 }
+/* measure char width for ghost alignment: monospace, same font -> ghost uses same box, so just overlay full text */
 boot();
 input.focus();
 </script>
