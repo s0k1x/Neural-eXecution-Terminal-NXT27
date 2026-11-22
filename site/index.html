@@ -91,17 +91,17 @@ footer{text-align:center;color:var(--txt-faint);font-size:11px;padding:48px 0 34
     <div class="eyebrow">neural · execution · terminal</div>
     <h1><b>NXT</b>27</h1>
     <div class="cmd"><span class="ps">neural@NXT-27:~$&nbsp;</span><span class="t" id="typed"></span><span class="cur"></span></div>
-    <p class="tag">Terminal web con estética hacker. Comandos reales, IA (Gemini), nube y un personaje con vida propia. Todo en el navegador.</p>
+    <p class="tag">Terminal web estilo pentest. Comandos reales, herramientas de ciberseguridad, un agente IA (Gemini) que ejecuta por ti y el modo NXT ULTRA. Todo en el navegador.</p>
     <div class="cta">
       <a class="btn primary" href="./terminal.html">▶ Abrir terminal</a>
       <a class="btn ghost" href="https://github.com/s0k1x/Neural-eXecution-Terminal-NXT27" target="_blank" rel="noopener">★ GitHub</a>
     </div>
     <div class="chips">
       <span class="chip"><b>+120</b> comandos</span>
-      <span class="chip">IA · <b>ask</b></span>
+      <span class="chip">agente IA · <b>ai</b></span>
+      <span class="chip">seguridad · <b>nmap</b></span>
       <span class="chip">nube · <b>wall</b></span>
-      <span class="chip">personaje · <b>puppet</b></span>
-      <span class="chip">pipes · temas</span>
+      <span class="chip">NXT <b>ULTRA</b></span>
     </div>
   </section>
 
@@ -123,7 +123,7 @@ footer{text-align:center;color:var(--txt-faint);font-size:11px;padding:48px 0 34
 
 <script>
   // typed command motif
-  const words=["neofetch","puppet","figlet NXT | lolcat","ask hola","wall hola a todos","dashboard"];
+  const words=["nmap 10.0.0.1","hash sha256 hola","cidr 192.168.1.0/24","ai comprueba las redes","jwt <token>","ultra <pass>"];
   const t=document.getElementById("typed"); let wi=0,ci=0,del=false;
   (function type(){ const w=words[wi]; t.textContent=w.slice(0,ci);
     if(!del&&ci<w.length){ci++;setTimeout(type,70);}
