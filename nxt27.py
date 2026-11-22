@@ -6,7 +6,7 @@ Uso:
   curl -fsSL https://raw.githubusercontent.com/s0k1x/Neural-eXecution-Terminal-NXT27/main/nxt27.py -o /tmp/nxt27.py && python3 /tmp/nxt27.py
 Solo stdlib. Herramientas reales (hash, subred, jwt, ping) + recon simulado/educativo.
 """
-import sys, os, hashlib, base64, binascii, ipaddress, platform, subprocess, getpass, uuid, secrets, math, shutil, json, time
+import sys, os, hashlib, base64, binascii, ipaddress, platform, subprocess, getpass, uuid, secrets, math, shutil, json, time, random
 
 V="\033[1;35m"; VB="\033[95m"; D="\033[90m"; G="\033[92m"; Y="\033[93m"; R="\033[91m"; C="\033[96m"; N="\033[0m"
 USER=getpass.getuser() or "root"; HOST=platform.node() or "nxt27"
@@ -23,7 +23,22 @@ FONT={'A':["█▀█","█▀█","▀ ▀"],'B':["█▀▄","█▀▄","▀�
 PORTS={20:"FTP-data",21:"FTP",22:"SSH",23:"Telnet",25:"SMTP",53:"DNS",80:"HTTP",110:"POP3",123:"NTP",143:"IMAP",161:"SNMP",389:"LDAP",443:"HTTPS",445:"SMB",587:"SMTP-sub",636:"LDAPS",993:"IMAPS",995:"POP3S",1433:"MSSQL",3306:"MySQL",3389:"RDP",5432:"PostgreSQL",5900:"VNC",6379:"Redis",8080:"HTTP-alt",8443:"HTTPS-alt",9200:"Elasticsearch",27017:"MongoDB"}
 COMMON=["123456","password","123456789","qwerty","111111","12345678","abc123","password1","admin","letmein","welcome","iloveyou","000000","dragon","shadow"]
 
+ULTRA_FILE=os.path.expanduser("~/.nxt27_ultra")
+ultra_on=[False]
+
 def p(s="",c=""): print((c+str(s)+N) if c else str(s))
+
+def ultra_animation():
+    cols,rows=shutil.get_terminal_size((80,24)); w=min(cols,78)
+    glyphs="01<>{}#*+=NXTULTRA/\\|▚▞█▓▒░"
+    sys.stdout.write("\033[2J\033[H")
+    for f in range(46):
+        row="".join((R if random.random()<0.85 else "\033[97m")+random.choice(glyphs)+N if random.random()<0.55 else " " for _ in range(w))
+        print(row); time.sleep(0.035)
+    sys.stdout.write("\033[2J\033[H")
+    for ln in figlet("ULTRA").split("\n"): print(R+"  "+ln+N)
+    print(); print(R+"  ⚡ NXT ULTRA ACTIVADO"+N)
+    print(D+"  modo ULTRA: prompt rojo · todo desbloqueado en tu terminal"+N); print(); time.sleep(0.3)
 
 def figlet(t):
     t=t.upper(); rows=["","",""]
@@ -55,6 +70,7 @@ def _help(a):
      "sistema":["help","clear","exit","neofetch","whoami","uname","date","banner","figlet"],
      "texto/cripto":["hash","b64","hex","unhex","bin","rot13","caesar","atbash","vigenere","xor","morse","uuid","genpass"],
      "seguridad":["cidr","jwt","strength","entropy","portref","ports","crack"],
+     "ultra":["ultra set <clave>","ultra <clave>  (modo ULTRA + animacion)"],
      "red (real si está instalada)":["ping","dig","whois","nmap","traceroute","ip"],
      "sistema real":["sh / ! (ejecuta un comando real del sistema)"],
     }
@@ -221,6 +237,22 @@ def _crack(a):
             p("encontrada: %s" % pw, G); p("-> por eso no uses contraseñas comunes", D); return
     p("no esta entre las comunes (bien)", G)
 
+@cmd("ultra")
+def _ultra(a):
+    if a and a[0]=="set":
+        pw=" ".join(a[1:])
+        if not pw: p("uso: ultra set <contraseña>", Y); return
+        try: open(ULTRA_FILE,"w").write(hashlib.sha256(pw.encode()).hexdigest())
+        except Exception as e: p("no se pudo guardar: %s"%e, R); return
+        p("contraseña ULTRA guardada. Entra con: ultra <contraseña>", G); return
+    if not os.path.exists(ULTRA_FILE):
+        p("primero define una contraseña:  ultra set <contraseña>", Y); return
+    pw=" ".join(a)
+    if not pw: p("uso: ultra <contraseña>", Y); return
+    if hashlib.sha256(pw.encode()).hexdigest()!=open(ULTRA_FILE).read().strip():
+        p("contraseña incorrecta", R); return
+    ultra_animation(); ultra_on[0]=True
+
 @cmd("ping")
 def _ping(a):
     host=a[0] if a else "1.1.1.1"
@@ -263,7 +295,9 @@ def main():
     print()
     while True:
         try:
-            line=input(V+USER+"@"+HOST+N+":"+C+"~"+N+"$ ")
+            uc = R if ultra_on[0] else V
+            badge = (R+" ⚡ULTRA"+N) if ultra_on[0] else ""
+            line=input(uc+USER+"@"+HOST+N+badge+":"+C+"~"+N+"$ ")
         except (EOFError,KeyboardInterrupt):
             print(); break
         try:
