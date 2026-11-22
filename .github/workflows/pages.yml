@@ -28,6 +28,7 @@ jobs:
           mkdir -p _site
           cp -r site/. _site/
           cp index.html _site/terminal.html
+          cp nxt27.sh _site/nxt27.sh
 
       - uses: actions/configure-pages@v5
 
