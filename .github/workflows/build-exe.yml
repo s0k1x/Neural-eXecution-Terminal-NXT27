@@ -24,14 +24,32 @@ jobs:
       - name: Build NXT27.exe
         run: pyinstaller --noconfirm --onefile --windowed --name NXT27 --add-data "index.html;." app.py
 
+      - name: Sign NXT27.exe (self-signed)
+        shell: pwsh
+        run: |
+          $cert = New-SelfSignedCertificate -Type CodeSigningCert `
+            -Subject "CN=NXT27, O=Neural eXecution Terminal" `
+            -CertStoreLocation Cert:\CurrentUser\My `
+            -KeyUsage DigitalSignature -KeyExportPolicy Exportable `
+            -NotAfter (Get-Date).AddYears(5)
+          $tsa = "http://timestamp.digicert.com"
+          Set-AuthenticodeSignature -FilePath dist/NXT27.exe -Certificate $cert -TimestampServer $tsa -HashAlgorithm SHA256
+          # Exporta el certificado publico para quien quiera confiar en el
+          Export-Certificate -Cert $cert -FilePath dist/NXT27-publisher.cer | Out-Null
+          Get-AuthenticodeSignature dist/NXT27.exe | Format-List Status, SignerCertificate
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: NXT27-exe
-          path: dist/NXT27.exe
+          path: |
+            dist/NXT27.exe
+            dist/NXT27-publisher.cer
 
       - name: Attach to release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/NXT27.exe
+          files: |
+            dist/NXT27.exe
+            dist/NXT27-publisher.cer
