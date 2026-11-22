@@ -6,6 +6,7 @@
   "main": "main.js",
   "author": "s0k1x",
   "license": "MIT",
+  "repository": "https://github.com/s0k1x/Neural-eXecution-Terminal-NXT27",
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder"
