@@ -2,26 +2,14 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const os = require("os");
+const fs = require("fs");
 const cp = require("child_process");
-const pty = require("node-pty");
 
 const isWin = process.platform === "win32";
-const SHELL = isWin ? "powershell.exe" : (process.env.SHELL || "bash");
+const SHELL = isWin ? "powershell.exe" : "/bin/bash";
 
 let win = null;
-let ptyProc = null;
-
-function spawnPty() {
-  ptyProc = pty.spawn(SHELL, [], {
-    name: "xterm-256color",
-    cols: 100,
-    rows: 30,
-    cwd: os.homedir(),
-    env: process.env,
-  });
-  ptyProc.onData((d) => { if (win && !win.isDestroyed()) win.webContents.send("pty:data", d); });
-  ptyProc.onExit(() => { if (win && !win.isDestroyed()) win.webContents.send("pty:data", "\r\n\x1b[90m[sesion finalizada]\x1b[0m\r\n"); });
-}
+let cwd = os.homedir();
 
 function createWindow() {
   win = new BrowserWindow({
@@ -36,38 +24,55 @@ function createWindow() {
     },
   });
   win.loadFile(path.join(__dirname, "renderer", "index.html"));
-  spawnPty();
 }
 
-ipcMain.on("pty:input", (_e, d) => { if (ptyProc) ptyProc.write(d); });
-ipcMain.on("pty:resize", (_e, s) => { try { ptyProc.resize(s.cols, s.rows); } catch (_) {} });
+ipcMain.handle("cwd", () => cwd);
+
+// Mini-shell: runs each command for real in the user's shell, keeps cwd.
+ipcMain.handle("run", (_e, raw) => {
+  const line = String(raw || "").trim();
+  if (!line) return { out: "", cwd };
+  if (/^(cls|clear)$/i.test(line)) return { clear: true, cwd };
+  const m = line.match(/^cd\s+(.+)$/i);
+  if (m) {
+    let t = m[1].trim().replace(/^["']|["']$/g, "").replace(/^~/, os.homedir());
+    const np = path.resolve(cwd, t);
+    try { if (fs.statSync(np).isDirectory()) { cwd = np; return { out: "", cwd }; } return { out: "cd: no es carpeta: " + t + "\n", cwd }; }
+    catch { return { out: "cd: no existe: " + t + "\n", cwd }; }
+  }
+  return new Promise((res) => {
+    cp.exec(line, { cwd, shell: SHELL, timeout: 180000, maxBuffer: 16 * 1024 * 1024, windowsHide: true },
+      (err, stdout, stderr) => {
+        let out = (stdout || "") + (stderr || "");
+        if (err && !out) out = String(err.message) + "\n";
+        res({ out, cwd });
+      });
+  });
+});
 
 ipcMain.handle("tools:check", () => {
   const which = isWin ? "where " : "command -v ";
   const has = (c) => { try { cp.execSync(which + c, { stdio: "ignore" }); return true; } catch (_) { return false; } };
-  return {
-    git: has("git"),
-    python: has(isWin ? "python" : "python3"),
-    node: has("node"),
-    npm: has("npm"),
-  };
+  return { git: has("git"), python: has(isWin ? "python" : "python3"), node: has("node"), npm: has("npm") };
 });
 
-// Auto-install missing tools via winget (Windows), shown live in the terminal.
-ipcMain.on("tools:setup", (_e, missing) => {
-  if (!ptyProc) return;
-  if (!isWin) {
-    ptyProc.write('echo "La instalacion automatica (winget) solo esta disponible en Windows."\r');
-    return;
-  }
+ipcMain.handle("tools:setup", async (_e, missing) => {
+  if (!isWin) return { out: "La instalacion automatica (winget) solo esta disponible en Windows.\n" };
   const ids = { git: "Git.Git", python: "Python.Python.3.12", node: "OpenJS.NodeJS" };
-  ptyProc.write('Write-Host "== NXT27: instalando dependencias faltantes ==" -ForegroundColor Magenta\r');
-  (missing || []).forEach((m) => {
-    if (ids[m]) ptyProc.write(`winget install --id ${ids[m]} -e --accept-package-agreements --accept-source-agreements\r`);
-  });
-  ptyProc.write('Write-Host "== Listo. Cierra y reabre la terminal para usar los nuevos comandos. ==" -ForegroundColor Green\r');
+  let out = "";
+  for (const m of (missing || [])) {
+    if (!ids[m]) continue;
+    out += "\n== instalando " + m + " ==\n";
+    out += await new Promise((res) => {
+      cp.exec(`winget install --id ${ids[m]} -e --accept-package-agreements --accept-source-agreements`,
+        { timeout: 600000, maxBuffer: 16 * 1024 * 1024, windowsHide: true },
+        (err, so, se) => res((so || "") + (se || "") + (err && !so ? String(err.message) + "\n" : "")));
+    });
+  }
+  out += "\n== listo · cierra y reabre la terminal para usar los nuevos comandos ==\n";
+  return { out };
 });
 
 app.whenReady().then(createWindow);
 app.on("activate", () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
-app.on("window-all-closed", () => { if (ptyProc) try { ptyProc.kill(); } catch (_) {} app.quit(); });
+app.on("window-all-closed", () => app.quit());
