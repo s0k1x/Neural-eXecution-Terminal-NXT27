@@ -2,480 +2,377 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NXT27 Terminal</title>
-<meta name="description" content="Neural eXecution Terminal NXT27 — demo visual del catálogo de módulos (sin funcionalidad real).">
+<meta name="description" content="Neural eXecution Terminal NXT27 — terminal web funcional con estética hacker.">
 <style>
-/* ---------- Tokens ---------- */
 :root{
-  --bg:#000000;
-  --panel:#07060a;
-  --panel-2:#0b0910;
-  --line:#2a1c3a;
-  --line-soft:#1a1324;
-  --violet:#a855f7;
-  --violet-bright:#c084fc;
-  --violet-dim:#6d28d9;
-  --violet-ghost:#3b2a55;
-  --txt:#e7e2f0;
-  --txt-dim:#8b82a0;
-  --txt-faint:#5a5270;
-  --white:#ffffff;
-  --glow:0 0 8px rgba(168,85,247,.55), 0 0 18px rgba(168,85,247,.25);
+  --bg:#050308;--panel:#0a0710;--line:#241834;--line-soft:#160f22;
+  --accent:#a855f7;--accent-bright:#c084fc;--accent-dim:#6d28d9;
+  --txt:#d9d2ea;--txt-dim:#8b82a0;--txt-faint:#564d6e;
+  --ok:#4ade80;--warn:#e3b341;--err:#f87171;
+  --glow:0 0 8px rgba(168,85,247,.5);
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
 body{
-  background:var(--bg);
-  color:var(--txt);
+  background:var(--bg);color:var(--txt);
   font-family:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  overflow:hidden;
+  font-size:14px;line-height:1.55;height:100dvh;overflow:hidden;
   -webkit-font-smoothing:antialiased;
 }
-button{font:inherit;color:inherit}
+/* subtle backdrop */
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(900px 500px at 50% -8%,rgba(109,40,217,.16),transparent 60%),
+    repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,.25) 3px 4px);
+  opacity:.7}
+#app{position:relative;z-index:1;display:flex;flex-direction:column;height:100dvh}
 
-/* ---------- Stage ---------- */
-#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+.bar{display:flex;align-items:center;gap:10px;padding:8px 14px;
+  background:#08050d;border-bottom:1px solid var(--line-soft);font-size:12px;color:var(--txt-dim)}
+.bar .hex{width:11px;height:11px;transform:rotate(45deg);background:var(--accent-bright);box-shadow:var(--glow)}
+.bar b{color:var(--txt);font-weight:700;letter-spacing:1px}
+.bar .spacer{flex:1}
+.bar .dot{width:9px;height:9px;border:1px solid var(--line);border-radius:50%}
+.bar .clk{color:var(--txt-faint)}
 
-/* ASCII mountains background */
-#mountains{
-  position:fixed;inset:0;pointer-events:none;opacity:.5;
-  color:#9a93ad;font-size:11px;line-height:11px;white-space:pre;
-  display:flex;flex-direction:column;justify-content:space-between;
-  padding:4vh 0;filter:contrast(1.1);
-}
-.mrow{overflow:hidden;white-space:nowrap;will-change:transform}
-.mrow span{display:inline-block}
+#term{flex:1;overflow-y:auto;padding:14px 16px 90px;scroll-behavior:smooth;
+  background:linear-gradient(180deg,rgba(168,85,247,.015),transparent 120px)}
+#term::-webkit-scrollbar{width:8px}
+#term::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
 
-/* Top-left poster caption */
-#caption{
-  position:fixed;top:5vh;left:6vw;z-index:40;
-  font-weight:800;letter-spacing:.5px;line-height:1.05;
-  text-transform:uppercase;color:var(--white);
-  font-family:Arial,Helvetica,sans-serif;font-style:italic;
-  text-shadow:0 2px 10px rgba(0,0,0,.8);
-}
-#caption .big{font-size:26px}
-#caption .sub{font-size:22px}
-@media(max-width:560px){#caption .big{font-size:19px}#caption .sub{font-size:16px}}
+.ln{white-space:pre-wrap;word-break:break-word}
+.muted{color:var(--txt-dim)}
+.faint{color:var(--txt-faint)}
+.accent{color:var(--accent-bright)}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.err{color:var(--err)}
+.ln b{color:var(--accent-bright);font-weight:700}
+.logo{color:var(--accent-bright);text-shadow:var(--glow);line-height:1.15;font-size:13px}
 
-/* ---------- Intro hands ---------- */
-#intro{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center}
-.hand{position:absolute;top:50%;width:46%;max-width:430px;filter:grayscale(1) contrast(1.4)}
-.hand svg{width:100%;height:auto;display:block}
-.hand .dith{filter:url(#dither)}
-#handL{left:-6%;transform:translateY(-50%)}
-#handR{right:-6%;transform:translateY(-50%) scaleX(-1)}
-#spark{
-  position:absolute;top:50%;left:50%;width:16px;height:16px;
-  transform:translate(-50%,-50%) rotate(45deg);
-  background:var(--violet-bright);box-shadow:var(--glow),0 0 30px rgba(192,132,252,.8);
-}
-@keyframes handInL{0%{transform:translate(-30%,-50%)}100%{transform:translate(0,-50%)}}
-@keyframes handInR{0%{transform:translate(30%,-50%) scaleX(-1)}100%{transform:translate(0,-50%) scaleX(-1)}}
-@keyframes sparkPulse{0%,100%{opacity:.6;transform:translate(-50%,-50%) rotate(45deg) scale(.7)}50%{opacity:1;transform:translate(-50%,-50%) rotate(45deg) scale(1.25)}}
+/* input row (also used in-flow for echoed history) */
+.row{display:flex;align-items:flex-start;gap:0;white-space:pre-wrap}
+.ps1{color:var(--accent-bright);white-space:pre}
+.ps1 .host{color:var(--accent)}
+.ps1 .path{color:var(--txt)}
 
-/* ---------- Terminal window ---------- */
-#win{
-  position:relative;z-index:20;width:min(92vw,980px);height:min(74vh,560px);
-  background:linear-gradient(180deg,var(--panel),var(--panel-2));
-  border:1px solid var(--line);border-radius:9px;overflow:hidden;
-  box-shadow:0 0 0 1px rgba(168,85,247,.08),0 30px 80px rgba(0,0,0,.7);
-  transform:scale(.2);opacity:0;
-}
-.titlebar{
-  height:34px;display:flex;align-items:center;gap:8px;padding:0 10px;
-  background:#0a0810;border-bottom:1px solid var(--line-soft);font-size:12px;color:var(--txt-dim);
-}
-.tb-dot{width:9px;height:9px;border:1px solid var(--line);border-radius:2px}
-.tb-tab{display:flex;align-items:center;gap:7px;padding:3px 10px;background:#120c1c;border:1px solid var(--line-soft);border-radius:5px;color:var(--txt)}
-.tb-tab .x{color:var(--txt-faint)}
-.tb-plus{margin-left:4px;color:var(--txt-faint)}
-.tb-ctrl{margin-left:auto;display:flex;gap:16px;color:var(--txt-faint)}
-.scanline{position:absolute;top:34px;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,var(--violet),var(--violet-bright),transparent);
-  opacity:.8;filter:drop-shadow(0 0 6px var(--violet));}
+#inputRow{position:sticky;bottom:0;display:flex;align-items:center;gap:0;
+  padding:10px 16px;background:linear-gradient(180deg,transparent,var(--bg) 30%);
+  border-top:1px solid var(--line-soft)}
+#cmd{flex:1;background:transparent;border:0;outline:0;color:var(--txt);
+  font:inherit;caret-color:var(--accent-bright);padding:0;margin:0}
+#cmd::placeholder{color:var(--txt-faint)}
 
-.screen{position:absolute;top:36px;left:0;right:0;bottom:0;overflow:hidden}
-#rain{position:absolute;inset:0;width:100%;height:100%}
-
-/* Logo stage */
-#logoStage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;opacity:0}
-#logo{font-weight:800;font-size:clamp(26px,6vw,64px);letter-spacing:4px;color:var(--violet-bright);
-  text-shadow:var(--glow);font-family:Arial,Helvetica,sans-serif;white-space:nowrap}
-#logoSub{font-size:11px;letter-spacing:6px;color:var(--txt-dim);text-transform:uppercase}
-
-/* ---------- Browser UI ---------- */
-#browser{position:absolute;inset:0;display:none;grid-template-columns:200px 1fr;opacity:0}
-.nav{border-right:1px solid var(--line-soft);padding:14px 0;overflow:auto}
-.nav h4{margin:0 0 8px;padding:0 16px;font-size:10px;letter-spacing:2px;color:var(--txt-faint)}
-.nav-item{display:flex;justify-content:space-between;align-items:center;gap:8px;
-  padding:6px 16px;font-size:12px;color:var(--txt-dim);cursor:pointer;border-left:2px solid transparent}
-.nav-item .id{color:var(--txt-faint);width:18px}
-.nav-item .nm{flex:1}
-.nav-item .ct{color:var(--violet-dim);font-size:10px}
-.nav-item:hover{color:var(--txt)}
-.nav-item.active{background:linear-gradient(90deg,rgba(168,85,247,.18),transparent);
-  color:var(--white);border-left-color:var(--violet)}
-
-.main{padding:14px 18px;overflow:auto;display:flex;flex-direction:column}
-.crumb{display:flex;justify-content:space-between;font-size:12px}
-.crumb .lhs{color:var(--violet-bright);font-weight:700;letter-spacing:1px}
-.crumb .rhs{color:var(--txt-faint);font-weight:700}
-.hints{font-size:11px;color:var(--txt-faint);margin:6px 0 14px;border-bottom:1px solid var(--line-soft);padding-bottom:10px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.card{border:1px solid var(--line-soft);border-radius:7px;padding:12px 14px;cursor:pointer;background:rgba(255,255,255,.012);transition:.12s}
-.card .t{font-size:12.5px;font-weight:700;color:var(--txt)}
-.card .t b{color:var(--violet-bright);margin-right:7px;font-family:ui-monospace,monospace}
-.card .d{font-size:11.5px;color:var(--txt-dim);margin:5px 0 7px;line-height:1.35}
-.card .tag{font-size:10px;letter-spacing:1px;color:var(--violet-dim)}
-.card.sel{border-color:var(--violet);background:rgba(168,85,247,.10);box-shadow:var(--glow)}
-.card:hover{border-color:var(--violet-ghost)}
-@media(max-width:620px){.grid{grid-template-columns:1fr}#browser{grid-template-columns:150px 1fr}}
-
-/* Module (inert) view */
-#module{position:absolute;inset:0;display:none;flex-direction:column;padding:16px 20px;font-size:12.5px}
-#module .box{border:1px solid var(--violet-dim);border-radius:6px;padding:10px 12px;max-width:560px}
-#module .trail{color:var(--txt-faint)}
-#module .mt{color:var(--violet-bright);font-weight:700;margin:2px 0}
-#module .md{color:var(--txt-dim)}
-#module .note{color:var(--txt-faint);margin:14px 0 4px}
-#module .warn{color:#e3b341}
-#module .prompt{margin-top:18px;color:var(--txt)}
-#module .prompt b{color:var(--violet-bright)}
-.caret{display:inline-block;width:8px;height:15px;background:var(--violet-bright);vertical-align:-3px;margin-left:3px;animation:blink 1s steps(1) infinite}
-@keyframes blink{50%{opacity:0}}
-.demo-badge{display:inline-block;margin-top:22px;padding:4px 10px;border:1px solid var(--violet-dim);border-radius:4px;color:var(--violet-bright);font-size:10px;letter-spacing:2px}
-
-/* Status bar */
-.status{position:absolute;left:0;right:0;bottom:0;height:26px;display:flex;align-items:center;gap:14px;
-  padding:0 14px;border-top:1px solid var(--line-soft);background:#070510;font-size:11px;color:var(--txt-dim)}
-.status .v{color:var(--violet-bright);font-weight:700}
-.status .sep{color:var(--violet-dim)}
-.status .host{margin-left:auto;color:var(--txt-faint)}
-.status .clk{color:var(--txt-dim)}
-
-#skip{position:fixed;right:14px;bottom:12px;z-index:60;background:transparent;border:1px solid var(--line);
-  color:var(--txt-faint);padding:5px 12px;border-radius:5px;font-size:11px;cursor:pointer}
-#skip:hover{color:var(--txt);border-color:var(--violet-ghost)}
-
-.hidden{display:none!important}
+a{color:var(--accent-bright)}
 </style>
 </head>
 <body>
-
-<svg width="0" height="0" style="position:absolute">
-  <filter id="dither">
-    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="n"/>
-    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 9 -4"/>
-    <feComposite operator="in" in2="SourceGraphic"/>
-    <feComponentTransfer><feFuncA type="discrete" tableValues="0 1 0 1 1"/></feComponentTransfer>
-  </filter>
-</svg>
-
-<div id="caption"><div class="big">BEST TOOLS?</div><div class="sub">/nxt27</div></div>
-<div id="mountains"></div>
-
-<!-- Intro hands -->
-<div id="intro">
-  <div class="hand" id="handL">
-    <svg viewBox="0 0 240 120"><g class="dith" fill="#cfcad8">
-      <path d="M0 78 Q40 70 70 72 Q92 73 110 66 L128 58 Q140 54 150 58 Q156 61 152 67 L138 74
-               Q150 70 162 70 Q172 71 170 78 Q168 83 158 84 L140 86 Q152 85 160 88 Q166 91 160 95
-               Q154 98 142 96 L120 92 Q132 94 138 99 Q141 103 134 104 Q126 105 112 100 L84 90
-               Q50 80 0 86 Z"/></g></svg>
+<div id="app">
+  <div class="bar">
+    <span class="hex"></span><b>NXT27</b>
+    <span class="muted">neural · execution · terminal</span>
+    <span class="spacer"></span>
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="clk" id="clk">--:--:--</span>
   </div>
-  <div class="hand" id="handR">
-    <svg viewBox="0 0 240 120"><g class="dith" fill="#cfcad8">
-      <path d="M0 78 Q40 70 70 72 Q92 73 110 66 L128 58 Q140 54 150 58 Q156 61 152 67 L138 74
-               Q150 70 162 70 Q172 71 170 78 Q168 83 158 84 L140 86 Q152 85 160 88 Q166 91 160 95
-               Q154 98 142 96 L120 92 Q132 94 138 99 Q141 103 134 104 Q126 105 112 100 L84 90
-               Q50 80 0 86 Z"/></g></svg>
-  </div>
-  <div id="spark"></div>
+
+  <div id="term" aria-live="polite"></div>
+
+  <form id="inputRow" autocomplete="off">
+    <span class="ps1" id="ps1"></span>
+    <input id="cmd" name="cmd" autocomplete="off" autocapitalize="off"
+           autocorrect="off" spellcheck="false" aria-label="comando" />
+  </form>
 </div>
-
-<!-- Terminal window -->
-<div id="stage">
-  <div id="win">
-    <div class="titlebar">
-      <div class="tb-tab"><span>⬡ NXT27</span><span class="x">✕</span></div>
-      <span class="tb-plus">＋ ⌄</span>
-      <div class="tb-ctrl"><span>—</span><span>▢</span><span>✕</span></div>
-    </div>
-    <div class="scanline"></div>
-    <div class="screen">
-      <canvas id="rain"></canvas>
-
-      <div id="logoStage">
-        <div id="logo">NXT27</div>
-        <div id="logoSub">neural · execution · terminal</div>
-      </div>
-
-      <!-- Browser -->
-      <div id="browser">
-        <div class="nav"><h4>NAVIGATION</h4><div id="navList"></div></div>
-        <div class="main">
-          <div class="crumb"><div class="lhs" id="crumbL">01 / HOME</div><div class="rhs" id="crumbR">6 MODULES</div></div>
-          <div class="hints">↑↓←→ explorar · Enter abrir · / buscar · Tab categoría · 1-99 acceso directo · Esc volver</div>
-          <div class="grid" id="grid"></div>
-        </div>
-      </div>
-
-      <!-- Module (inert) -->
-      <div id="module">
-        <div class="box">
-          <div class="trail" id="mTrail"></div>
-          <div class="mt" id="mName"></div>
-          <div class="md" id="mDesc"></div>
-        </div>
-        <div class="note">Esc para volver en cualquier momento.</div>
-        <div class="warn">▲ Demo visual: este módulo no ejecuta ni genera nada.</div>
-        <div class="prompt"><b>&gt;</b> <span id="mField">entrada</span> = <span class="caret"></span></div>
-        <div class="demo-badge">DEMO · SIN FUNCIONALIDAD</div>
-      </div>
-
-      <div class="status">
-        <span class="v">NXT27 v1.0</span>
-        <span class="sep">▸</span>
-        <span id="stModule">HOME</span>
-        <span class="host" id="stHost">neural@NXT-27</span>
-        <span class="sep">|</span>
-        <span class="clk" id="clk">00:00:00</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<button id="skip">SKIP INTRO →</button>
 
 <script>
-/* ===================== DATA (fictional, inert) ===================== */
-const CATS = [
-  {id:"01", name:"HOME",     tag:"SYSTEM"},
-  {id:"02", name:"NETWORK",  tag:"NET"},
-  {id:"03", name:"DOMAINS",  tag:"DNS"},
-  {id:"04", name:"WEB",      tag:"WEB"},
-  {id:"05", name:"OSINT",    tag:"OSINT"},
-  {id:"06", name:"RECON",    tag:"RECON"},
-  {id:"07", name:"FORMAT",   tag:"TEXT"},
-  {id:"08", name:"CONVERT",  tag:"CONV"},
-  {id:"09", name:"FILES",    tag:"FS"},
-  {id:"10", name:"DATA",     tag:"DATA"},
-  {id:"11", name:"CRYPTO",   tag:"HASH"},
-  {id:"12", name:"UTILS",    tag:"UTIL"},
-];
-// 6 demo modules per category — all placeholder/non-functional
-const WORDS=["TRACE","PULSE","SCAN","MAPPER","RESOLVE","PROBE","FETCH","PARSE","INDEX","WATCH","ECHO","FORGE"];
-const DESCS=[
-  "Analizar una entrada y mostrar un informe.",
-  "Medir latencia y variación de una ruta.",
-  "Recorrer una lista de puertos ficticios.",
-  "Construir un mapa de nodos de ejemplo.",
-  "Resolver un identificador a sus alias.",
-  "Inspeccionar cabeceras de una respuesta.",
-];
-function modulesFor(cat, idx){
-  const base = idx*6 + 1;
-  return Array.from({length:6},(_,i)=>({
-    num: String(base+i).padStart(2,"0"),
-    name: (cat.name.slice(0,4)+" "+WORDS[(idx+i)%WORDS.length]).toUpperCase(),
-    desc: DESCS[i%DESCS.length],
-    tag: cat.tag,
-  }));
+"use strict";
+const term = document.getElementById("term");
+const input = document.getElementById("cmd");
+const ps1El = document.getElementById("ps1");
+const clkEl = document.getElementById("clk");
+
+const USER = "neural", HOST = "NXT-27";
+const started = Date.now();
+
+/* ---------- virtual filesystem ---------- */
+const FS = {
+  "readme.txt": "NXT27 — Neural eXecution Terminal\nTerminal web con estetica. Escribe 'help' para ver comandos.",
+  "about.txt": "Demo con toque visual y comandos reales (offline, en tu navegador).",
+  proyectos: {
+    "nxt27.md": "# NXT27\nterminal + .exe + web. Hecho para divertirse.",
+    "ideas.txt": "- temas de color\n- mas comandos\n- mini-juegos"
+  },
+  logs: { "boot.log": "[ok] kernel\n[ok] display\n[ok] shell" }
+};
+let cwd = []; // path segments from root
+
+function nodeAt(segs){
+  let n = FS;
+  for(const s of segs){ if(n && typeof n==="object" && s in n) n=n[s]; else return undefined; }
+  return n;
+}
+function cwdLabel(){ return "~" + (cwd.length? "/"+cwd.join("/") : ""); }
+function resolve(path){
+  // returns new segment array or null
+  let segs = (path.startsWith("/")||path.startsWith("~")) ? [] : cwd.slice();
+  for(const part of path.replace(/^~\/?/,"").split("/")){
+    if(part===""||part===".") continue;
+    if(part===".."){ segs.pop(); continue; }
+    segs.push(part);
+  }
+  return segs;
 }
 
-/* ===================== STATE ===================== */
-let catIdx=0, selIdx=0, inModule=false, typed="";
-const $=s=>document.querySelector(s);
-const navList=$("#navList"), grid=$("#grid");
-
-/* ===================== RENDER ===================== */
-function renderNav(){
-  navList.innerHTML="";
-  CATS.forEach((c,i)=>{
-    const el=document.createElement("div");
-    el.className="nav-item"+(i===catIdx?" active":"");
-    el.innerHTML=`<span class="id">${c.id}</span><span class="nm">${c.name}</span><span class="ct">${6}</span>`;
-    el.onclick=()=>{catIdx=i;selIdx=0;renderAll();};
-    navList.appendChild(el);
-  });
+/* ---------- output helpers ---------- */
+function out(text="", cls=""){
+  const d=document.createElement("div");
+  d.className="ln"+(cls?" "+cls:"");
+  d.textContent=text;
+  term.appendChild(d);
 }
-function renderGrid(){
-  const cat=CATS[catIdx], mods=modulesFor(cat,catIdx);
-  $("#crumbL").textContent=`${cat.id} / ${cat.name}`;
-  $("#crumbR").textContent=`6 MODULES`;
-  $("#stModule").textContent=cat.name;
-  grid.innerHTML="";
-  mods.forEach((m,i)=>{
-    const el=document.createElement("div");
-    el.className="card"+(i===selIdx?" sel":"");
-    el.innerHTML=`<div class="t"><b>${m.num}</b>${m.name}</div><div class="d">${m.desc}</div><div class="tag">${m.tag}</div>`;
-    el.onclick=()=>{selIdx=i;openModule();};
-    el.onmouseenter=()=>{selIdx=i;paintSel();};
-    grid.appendChild(el);
-  });
+function outHTML(html, cls=""){
+  const d=document.createElement("div");
+  d.className="ln"+(cls?" "+cls:"");
+  d.innerHTML=html;
+  term.appendChild(d);
 }
-function paintSel(){[...grid.children].forEach((c,i)=>c.classList.toggle("sel",i===selIdx));}
-function renderAll(){renderNav();renderGrid();}
-
-function openModule(){
-  const cat=CATS[catIdx], m=modulesFor(cat,catIdx)[selIdx];
-  inModule=true;
-  $("#mTrail").textContent=`◆ NXT27 › ${cat.name} › MODULE #${m.num}`;
-  $("#mName").textContent=m.name;
-  $("#mDesc").textContent=m.desc;
-  $("#mField").textContent="Parámetro ["+m.name.split(" ")[1]+"]";
-  $("#browser").style.display="none";
-  $("#module").style.display="flex";
+function echoCommand(line){
+  const d=document.createElement("div");
+  d.className="row";
+  d.innerHTML=`<span class="ps1">${ps1HTML()}</span>`;
+  const c=document.createElement("span");
+  c.textContent=line;
+  d.appendChild(c);
+  term.appendChild(d);
 }
-function closeModule(){inModule=false;$("#module").style.display="none";$("#browser").style.display="grid";}
+function scroll(){ term.scrollTop=term.scrollHeight; }
 
-/* ===================== KEYBOARD ===================== */
-window.addEventListener("keydown",e=>{
-  if($("#browser").style.display==="none" && !inModule) return; // not in UI yet
-  if(inModule){ if(e.key==="Escape") closeModule(); return; }
-  const k=e.key;
-  if(k==="ArrowRight"){selIdx=Math.min(5,selIdx+1);paintSel();}
-  else if(k==="ArrowLeft"){selIdx=Math.max(0,selIdx-1);paintSel();}
-  else if(k==="ArrowDown"){selIdx=Math.min(5,selIdx+2);paintSel();}
-  else if(k==="ArrowUp"){selIdx=Math.max(0,selIdx-2);paintSel();}
-  else if(k==="Tab"){e.preventDefault();catIdx=(catIdx+(e.shiftKey?-1+CATS.length:1))%CATS.length;selIdx=0;renderAll();}
-  else if(k==="Enter"){openModule();}
-  else if(/^[0-9]$/.test(k)){ typed=(typed+k).slice(-2); const n=parseInt(typed,10);
-    if(n>=1&&n<=CATS.length){catIdx=n-1;selIdx=0;renderAll();} }
+function ps1HTML(){
+  return `<span class="host">${USER}@${HOST}</span>:<span class="path">${cwdLabel()}</span>$ `;
+}
+function renderPrompt(){ ps1El.innerHTML=ps1HTML(); }
+
+/* ---------- commands ---------- */
+const LOGO = String.raw`
+ ███╗   ██╗██╗  ██╗████████╗██████╗ ███████╗
+ ████╗  ██║╚██╗██╔╝╚══██╔══╝╚════██╗╚════██║
+ ██╔██╗ ██║ ╚███╔╝    ██║    █████╔╝    ██╔╝
+ ██║╚██╗██║ ██╔██╗    ██║   ██╔═══╝    ██╔╝
+ ██║ ╚████║██╔╝ ██╗   ██║   ███████╗   ██║
+ ╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝   ╚══════╝   ╚═╝`;
+
+const THEMES = {
+  violet:["#a855f7","#c084fc","#6d28d9"],
+  cyan:  ["#22d3ee","#67e8f9","#0891b2"],
+  green: ["#22c55e","#4ade80","#15803d"],
+  amber: ["#f59e0b","#fbbf24","#b45309"],
+  red:   ["#ef4444","#f87171","#b91c1c"],
+  pink:  ["#ec4899","#f9a8d4","#be185d"],
+};
+
+const COMMANDS = {
+  help(){
+    out("Comandos disponibles:","accent");
+    const list=[
+      ["help","esta ayuda"],["clear","limpia la pantalla"],
+      ["echo <txt>","imprime texto"],["whoami","usuario actual"],
+      ["date","fecha y hora"],["uptime","tiempo encendido"],
+      ["ls [ruta]","lista archivos"],["cd <ruta>","cambia de carpeta"],
+      ["pwd","ruta actual"],["cat <archivo>","muestra un archivo"],
+      ["tree","arbol de archivos"],["mkdir <n>","crea carpeta"],
+      ["touch <n>","crea archivo"],["rm <n>","borra"],
+      ["calc <expr>","calculadora (2+2*3)"],["neofetch","info del sistema"],
+      ["banner","logo NXT27"],["theme <color>","cambia color"],
+      ["history","historial"],["about","sobre esto"],["exit","reinicia"],
+    ];
+    const w=Math.max(...list.map(c=>c[0].length));
+    for(const [c,d] of list) out("  "+c.padEnd(w+2)+" "+d,"muted");
+    out("");
+    out("Atajos: ↑/↓ historial · Tab autocompletar · Ctrl+L limpiar","faint");
+  },
+  clear(){ term.innerHTML=""; },
+  echo(args){ out(args.join(" ")); },
+  whoami(){ out(USER); },
+  date(){ out(new Date().toString()); },
+  uptime(){
+    const s=Math.floor((Date.now()-started)/1000);
+    const m=Math.floor(s/60), h=Math.floor(m/60);
+    out(`activo ${h}h ${m%60}m ${s%60}s`);
+  },
+  pwd(){ out("/"+cwd.join("/")); },
+  ls(args){
+    const target = args[0] ? resolve(args[0]) : cwd;
+    const n = nodeAt(target);
+    if(n===undefined) return out("ls: no existe: "+args[0],"err");
+    if(typeof n==="string") return out(args[0]);
+    const keys=Object.keys(n);
+    if(!keys.length) return out("(vacio)","faint");
+    for(const k of keys){
+      const dir = typeof n[k]==="object";
+      outHTML(`  <span class="${dir?'accent':''}">${k}${dir?'/':''}</span>`);
+    }
+  },
+  cd(args){
+    if(!args[0]||args[0]==="~"){ cwd=[]; return; }
+    const segs=resolve(args[0]);
+    const n=nodeAt(segs);
+    if(n===undefined) return out("cd: no existe: "+args[0],"err");
+    if(typeof n!=="object") return out("cd: no es una carpeta: "+args[0],"err");
+    cwd=segs;
+  },
+  cat(args){
+    if(!args[0]) return out("uso: cat <archivo>","warn");
+    const n=nodeAt(resolve(args[0]));
+    if(n===undefined) return out("cat: no existe: "+args[0],"err");
+    if(typeof n==="object") return out("cat: es una carpeta","err");
+    out(n);
+  },
+  tree(){
+    const walk=(n,pre)=>{
+      const keys=Object.keys(n);
+      keys.forEach((k,i)=>{
+        const last=i===keys.length-1, dir=typeof n[k]==="object";
+        outHTML(pre+(last?"└─ ":"├─ ")+`<span class="${dir?'accent':''}">${k}${dir?'/':''}</span>`);
+        if(dir) walk(n[k],pre+(last?"   ":"│  "));
+      });
+    };
+    outHTML("<span class='accent'>~/</span>");
+    walk(nodeAt(cwd),"");
+  },
+  mkdir(args){
+    if(!args[0]) return out("uso: mkdir <nombre>","warn");
+    const p=nodeAt(cwd); if(args[0] in p) return out("ya existe","err");
+    p[args[0]]={};
+  },
+  touch(args){
+    if(!args[0]) return out("uso: touch <nombre>","warn");
+    const p=nodeAt(cwd); if(!(args[0] in p)) p[args[0]]="";
+  },
+  rm(args){
+    if(!args[0]) return out("uso: rm <nombre>","warn");
+    const p=nodeAt(cwd);
+    if(!(args[0] in p)) return out("rm: no existe","err");
+    delete p[args[0]];
+  },
+  calc(args){
+    const expr=args.join(" ");
+    if(!/^[-0-9.+*/%()\s]+$/.test(expr)) return out("calc: solo numeros y + - * / % ( )","err");
+    try{ const r=Function('"use strict";return ('+expr+')')(); out(String(r),"ok"); }
+    catch{ out("calc: expresion invalida","err"); }
+  },
+  banner(){ out(LOGO,"logo"); },
+  about(){
+    out("NXT27 · Neural eXecution Terminal","accent");
+    out("Terminal web con toque visual. Comandos reales, offline.","muted");
+    out("Codigo: github.com/s0k1x/Neural-eXecution-Terminal-NXT27","faint");
+  },
+  neofetch(){
+    const ua=navigator.userAgent;
+    const os = /Windows/.test(ua)?"Windows": /Android/.test(ua)?"Android":
+               /iPhone|iPad|iOS/.test(ua)?"iOS": /Mac/.test(ua)?"macOS":
+               /Linux/.test(ua)?"Linux":"Desconocido";
+    const br = /Edg/.test(ua)?"Edge": /Chrome/.test(ua)?"Chrome":
+               /Firefox/.test(ua)?"Firefox": /Safari/.test(ua)?"Safari":"Navegador";
+    const info=[
+      [USER+"@"+HOST.toLowerCase(),""],
+      ["os",os],["shell","nxt-sh 1.0"],["host",br],
+      ["res",`${screen.width}x${screen.height} @${window.devicePixelRatio||1}x`],
+      ["cpu",(navigator.hardwareConcurrency||"?")+" hilos"],
+      ["mem",(navigator.deviceMemory? navigator.deviceMemory+" GB":"n/d")],
+      ["lang",navigator.language||"?"],
+      ["uptime",Math.floor((Date.now()-started)/1000)+"s"],
+    ];
+    const logo=LOGO.split("\n").filter(Boolean);
+    const rows=Math.max(logo.length,info.length);
+    for(let i=0;i<rows;i++){
+      const l=(logo[i]||"").padEnd(46);
+      let r="";
+      if(info[i]){
+        r = info[i][1]==="" ? `<b>${info[i][0]}</b>` : `<span class="accent">${info[i][0]}</span> ${info[i][1]}`;
+      }
+      outHTML(`<span class="logo">${l.replace(/ /g,"&nbsp;")}</span>${r}`);
+    }
+  },
+  theme(args){
+    const t=args[0];
+    if(!t||!THEMES[t]){ out("temas: "+Object.keys(THEMES).join(", "),"warn"); return; }
+    const [a,b,c]=THEMES[t];
+    const r=document.documentElement.style;
+    r.setProperty("--accent",a);r.setProperty("--accent-bright",b);r.setProperty("--accent-dim",c);
+    out("tema → "+t,"ok");
+  },
+  history(){ hist.forEach((h,i)=>out("  "+String(i+1).padStart(3)+"  "+h,"muted")); },
+  exit(){ term.innerHTML=""; boot(); },
+};
+const ALIASES={cls:"clear","?":"help",dir:"ls",clr:"clear"};
+
+/* ---------- runner ---------- */
+let hist=[], hi=-1;
+function run(line){
+  const trimmed=line.trim();
+  echoCommand(line);
+  if(trimmed){
+    hist.push(trimmed); hi=hist.length;
+    const parts=trimmed.match(/(?:[^\s"]+|"[^"]*")+/g).map(s=>s.replace(/"/g,""));
+    let cmd=parts[0].toLowerCase(); const args=parts.slice(1);
+    if(ALIASES[cmd]) cmd=ALIASES[cmd];
+    if(COMMANDS[cmd]){ try{ COMMANDS[cmd](args); }catch(e){ out("error: "+e.message,"err"); } }
+    else out(cmd+": comando no encontrado — escribe 'help'","err");
+  }
+  renderPrompt(); scroll();
+}
+
+/* ---------- autocomplete ---------- */
+function complete(){
+  const v=input.value, parts=v.split(" ");
+  if(parts.length<=1){
+    const pool=[...Object.keys(COMMANDS),...Object.keys(ALIASES)];
+    const m=pool.filter(c=>c.startsWith(v));
+    if(m.length===1) input.value=m[0]+" ";
+    else if(m.length>1){ echoCommand(v); out(m.join("  "),"faint"); scroll(); }
+  }else{
+    const frag=parts[parts.length-1];
+    const n=nodeAt(cwd); if(typeof n!=="object") return;
+    const m=Object.keys(n).filter(k=>k.startsWith(frag));
+    if(m.length===1){ parts[parts.length-1]=m[0]+(typeof n[m[0]]==="object"?"/":""); input.value=parts.join(" "); }
+    else if(m.length>1){ echoCommand(v); out(m.join("  "),"faint"); scroll(); }
+  }
+}
+
+/* ---------- events ---------- */
+document.getElementById("inputRow").addEventListener("submit",e=>{
+  e.preventDefault(); const v=input.value; input.value=""; run(v);
+});
+input.addEventListener("keydown",e=>{
+  if(e.key==="ArrowUp"){ e.preventDefault(); if(hi>0){hi--;input.value=hist[hi]||"";} }
+  else if(e.key==="ArrowDown"){ e.preventDefault(); if(hi<hist.length-1){hi++;input.value=hist[hi]||"";} else {hi=hist.length;input.value="";} }
+  else if(e.key==="Tab"){ e.preventDefault(); complete(); }
+  else if(e.key==="l"&&e.ctrlKey){ e.preventDefault(); COMMANDS.clear(); }
+  else if(e.key==="c"&&e.ctrlKey){ echoCommand(input.value+"^C"); input.value=""; renderPrompt(); scroll(); }
+});
+// keep focus; tap anywhere focuses input (mobile keyboard)
+term.addEventListener("click",()=>{ if(!getSelection().toString()) input.focus(); });
+document.getElementById("app").addEventListener("click",e=>{
+  if(e.target.closest(".bar")) return;
+  if(!getSelection().toString()) input.focus();
 });
 
-/* ===================== MATRIX RAIN ===================== */
-const cv=$("#rain"), ctx=cv.getContext("2d");
-let drops=[], rainOn=true, cols=0;
-function sizeRain(){
-  const r=cv.getBoundingClientRect();
-  cv.width=r.width;cv.height=r.height;
-  cols=Math.floor(r.width/12);
-  drops=Array.from({length:cols},()=>Math.random()*-40);
+/* ---------- clock ---------- */
+setInterval(()=>{ clkEl.textContent=new Date().toTimeString().slice(0,8); },1000);
+
+/* ---------- boot ---------- */
+function boot(){
+  out(LOGO,"logo");
+  out("");
+  outHTML(`<span class="accent">Neural eXecution Terminal</span> <span class="faint">v1.0</span>`);
+  out("Terminal web — comandos reales, sin conexion.","muted");
+  outHTML(`Escribe <b>help</b> para empezar · prueba <b>neofetch</b>, <b>calc 7*6</b>, <b>theme cyan</b>`,"muted");
+  out("");
+  renderPrompt(); scroll();
 }
-const GLYPHS="01<>/\\{}[]#*+=NXT27";
-function drawRain(){
-  if(!rainOn){return;}
-  ctx.fillStyle="rgba(0,0,0,.08)";ctx.fillRect(0,0,cv.width,cv.height);
-  ctx.font="12px monospace";
-  for(let i=0;i<cols;i++){
-    const ch=GLYPHS[Math.floor(Math.random()*GLYPHS.length)];
-    const x=i*12, y=drops[i]*14;
-    ctx.fillStyle= Math.random()<.1 ? "#e9d5ff" : "rgba(168,85,247,.85)";
-    ctx.fillText(ch,x,y);
-    if(y>cv.height && Math.random()>.975) drops[i]=0;
-    drops[i]+= .5+Math.random()*.6;
-  }
-  requestAnimationFrame(drawRain);
-}
-
-/* ===================== MOUNTAINS (ASCII waves) ===================== */
-function buildMountains(){
-  const host=$("#mountains");host.innerHTML="";
-  const chars="▁▂▃▄▅▆▇█▇▆▅▄▃▂▁ ░▒";
-  for(let r=0;r<8;r++){
-    const row=document.createElement("div");row.className="mrow";
-    const span=document.createElement("span");
-    let s="";const len=400;const amp=2+Math.random()*4;const ph=Math.random()*6;
-    for(let i=0;i<len;i++){
-      const v=Math.sin(i*0.12+ph)*amp + Math.sin(i*0.03+r)*2;
-      const idx=Math.max(0,Math.min(chars.length-1,Math.round((v+amp+3))));
-      s+=chars[idx%chars.length];
-    }
-    span.textContent=s+s;
-    const dur=(28+r*6)+"s";const dir=r%2?1:-1;
-    span.style.animation=`drift${r%2} ${dur} linear infinite`;
-    row.appendChild(span);host.appendChild(row);
-  }
-  if(!document.getElementById("mkeyf")){
-    const st=document.createElement("style");st.id="mkeyf";
-    st.textContent="@keyframes drift0{from{transform:translateX(0)}to{transform:translateX(-50%)}}"+
-                   "@keyframes drift1{from{transform:translateX(-50%)}to{transform:translateX(0)}}";
-    document.head.appendChild(st);
-  }
-}
-
-/* ===================== CLOCK ===================== */
-setInterval(()=>{const d=new Date();$("#clk").textContent=d.toTimeString().slice(0,8);},1000);
-
-/* ===================== GLITCH LOGO ASSEMBLY ===================== */
-const SCR="▚▞▙▟█▓▒░#@%&/\\<>NXT0127";
-function scrambleLogo(target, el, dur=1600){
-  const start=performance.now();
-  (function frame(now){
-    const p=Math.min(1,(now-start)/dur);
-    let out="";
-    for(let i=0;i<target.length;i++){
-      if(i/target.length < p) out+=target[i];
-      else out+= SCR[Math.floor(Math.random()*SCR.length)];
-    }
-    el.textContent=out;
-    el.style.transform= p<1 ? `translateX(${(Math.random()-.5)*6}px)`:"none";
-    if(p<1) requestAnimationFrame(frame);
-    else el.textContent=target;
-  })(start);
-}
-
-/* ===================== SEQUENCE ===================== */
-function animate(el,kf,opt){return el.animate(kf,opt);}
-let seqTimers=[];
-function run(fn,ms){seqTimers.push(setTimeout(fn,ms));}
-
-function startSequence(){
-  buildMountains();
-  sizeRain();drawRain();
-  // intro hands slide in
-  $("#handL").style.animation="handInL 2s cubic-bezier(.2,.7,.2,1) forwards";
-  $("#handR").style.animation="handInR 2s cubic-bezier(.2,.7,.2,1) forwards";
-  $("#spark").style.animation="sparkPulse 1.2s ease-in-out infinite";
-
-  // window pops after hands meet
-  run(()=>{
-    $("#win").animate(
-      [{transform:"scale(.2)",opacity:0},{transform:"scale(1.04)",opacity:1,offset:.8},{transform:"scale(1)",opacity:1}],
-      {duration:700,easing:"cubic-bezier(.2,.8,.2,1)",fill:"forwards"});
-  },2100);
-
-  // fade intro
-  run(()=>{ $("#intro").animate([{opacity:1},{opacity:0}],{duration:600,fill:"forwards"}); },2500);
-  run(()=>{$("#intro").classList.add("hidden");},3100);
-
-  // logo assembles over rain
-  run(()=>{
-    $("#logoStage").animate([{opacity:0},{opacity:1}],{duration:400,fill:"forwards"});
-    scrambleLogo("NXT27",$("#logo"),1700);
-    scrambleLogo("NEURAL · EXECUTION · TERMINAL",$("#logoSub"),1500);
-  },3200);
-
-  // rain fades, browser enters
-  run(()=>{
-    rainOn=false;
-    cv.animate([{opacity:1},{opacity:.12}],{duration:900,fill:"forwards"});
-    $("#logoStage").animate([{opacity:1},{opacity:0}],{duration:600,fill:"forwards"});
-  },5400);
-  run(()=>{
-    $("#logoStage").style.display="none";
-    renderAll();
-    const b=$("#browser");b.style.display="grid";
-    b.animate([{opacity:0,transform:"translateY(8px)"},{opacity:1,transform:"none"}],{duration:500,fill:"forwards"});
-  },6100);
-}
-
-function skip(){
-  seqTimers.forEach(clearTimeout);seqTimers=[];
-  rainOn=false;cv.style.opacity=.12;
-  $("#intro").classList.add("hidden");
-  $("#logoStage").style.display="none";
-  $("#win").style.transform="scale(1)";$("#win").style.opacity=1;
-  renderAll();
-  $("#browser").style.display="grid";$("#browser").style.opacity=1;
-}
-$("#skip").onclick=skip;
-window.addEventListener("resize",()=>{sizeRain();});
-
-startSequence();
+boot();
+input.focus();
 </script>
 </body>
 </html>
