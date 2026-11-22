@@ -114,6 +114,41 @@ svg.icon{width:1em;height:1em;vertical-align:-.12em;stroke:currentColor;fill:non
 @keyframes barGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* ---------- puppet (AI-controlled skeleton) ---------- */
+#puppet{position:fixed;inset:0;z-index:72;display:none;flex-direction:column;
+  background-color:#04030a;background-image:radial-gradient(700px 500px at 50% 28%,rgba(109,40,217,.28),transparent 68%)}
+.pp-bar{display:flex;align-items:center;gap:9px;padding:9px 14px;background:#08050d;border-bottom:1px solid var(--line-soft);font-size:12px;color:var(--txt-dim)}
+.pp-bar .hex{width:11px;height:11px;transform:rotate(45deg);background:var(--accent-bright);box-shadow:var(--glow)}
+.pp-bar b{color:var(--txt);letter-spacing:1px}
+.pp-x{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--txt-dim);border-radius:6px;padding:4px 10px;cursor:pointer}
+.pp-x:hover{color:#fff;border-color:var(--accent-dim)}
+.pp-stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#ppSvg{width:min(92vw,440px);height:auto;max-height:70vh;filter:drop-shadow(0 0 10px rgba(168,85,247,.35))}
+.pp-bubble{position:absolute;top:6%;left:50%;transform:translateX(-50%);max-width:80%;
+  background:#0c0916;border:1px solid var(--accent-dim);border-radius:12px;padding:9px 14px;color:var(--txt);
+  font-size:13px;opacity:0;transition:opacity .3s;box-shadow:var(--glow)}
+.pp-bubble.show{opacity:1}
+.pp-load{position:absolute;bottom:14%;left:50%;transform:translateX(-50%);display:none;align-items:center;gap:9px;color:var(--accent-bright);font-size:12px}
+.pp-load.show{display:flex}
+.pp-load .sp{width:15px;height:15px;border:2px solid var(--line);border-top-color:var(--accent-bright);border-radius:50%;animation:spin .7s linear infinite}
+.pp-foot{display:flex;align-items:center;gap:14px;padding:11px 16px;border-top:1px solid var(--line-soft);background:#07050d;font-size:12px}
+.pp-mood{color:var(--accent-bright);font-weight:700}
+.pp-hint{color:var(--txt-faint);margin-left:auto}
+.bone{stroke:var(--accent-bright);stroke-linecap:round;fill:none}
+
+/* ---------- file upload animations ---------- */
+#dropz{position:fixed;inset:0;z-index:68;display:none;align-items:center;justify-content:center;
+  background:rgba(4,3,10,.82);backdrop-filter:blur(3px)}
+#dropz.show{display:flex;animation:fadeUp .2s ease}
+.dz-card{border:2px dashed var(--accent);border-radius:18px;padding:48px 60px;text-align:center;color:var(--txt);
+  box-shadow:var(--glow);animation:dzPulse 1.2s ease-in-out infinite}
+.dz-card .icon{font-size:52px;color:var(--accent-bright);display:block;margin-bottom:10px}
+@keyframes dzPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.up-item{display:flex;align-items:center;gap:10px;margin:4px 0;animation:fadeUp .3s ease both}
+.up-item .bar{flex:1;max-width:220px;height:8px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#0a0710}
+.up-item .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent-dim),var(--accent-bright));transition:width .25s}
+.up-thumb{max-width:260px;max-height:200px;border:1px solid var(--line);border-radius:8px;margin:6px 0;animation:fadeUp .35s ease both}
+
 /* overlays */
 #overlay{position:fixed;inset:0;z-index:50;display:none;background:#000}
 #overlay canvas{width:100%;height:100%;display:block}
@@ -177,6 +212,24 @@ svg.icon{width:1em;height:1em;vertical-align:-.12em;stroke:currentColor;fill:non
 </div>
 
 <div id="overlay"><canvas id="ocanvas"></canvas></div>
+
+<div id="puppet">
+  <div class="pp-bar"><span class="hex"></span><b>NXT27</b><span class="muted">NXT · ser digital con conciencia</span>
+    <button class="pp-x" id="ppClose">✕ cerrar</button></div>
+  <div class="pp-stage">
+    <div class="pp-bubble" id="ppBubble"></div>
+    <svg id="ppSvg" viewBox="0 0 400 440"></svg>
+    <div class="pp-load" id="ppLoad"><span class="sp"></span> la IA está pensando…</div>
+  </div>
+  <div class="pp-foot">
+    <span class="pp-mood" id="ppMood">● despertando…</span>
+    <span class="pp-hint">NXT vive por su cuenta — solo obsérvala</span>
+  </div>
+</div>
+
+<div id="dropz"><div class="dz-card"><span class="icon">⬆</span>Suelta los archivos aquí<br><span class="faint" style="font-size:12px">se guardan en tu terminal</span></div></div>
+<input type="file" id="fileInput" multiple style="display:none">
+<input type="file" id="imgInput" accept="image/*" style="display:none">
 <div id="editor">
   <div class="eh"><b id="edName"></b><span class="spacer" style="flex:1"></span>
     <span><span class="kbd">Ctrl+S</span> guardar</span><span><span class="kbd">Esc</span> salir</span></div>
@@ -349,6 +402,7 @@ def("help","muestra la ayuda",(a)=>{
     "texto":["rev","upper","lower","sort","uniq","nl","tr","base64","rot13","hash","uuid","urlencode","urldecode","json","morse","password","seq","cal"],
     "sistema":["neofetch","whoami","uname","hostname","uptime","date","free","df","ps","top","battery","theme"],
     "dev":["git"],
+    "ia":["puppet","ask","upload","show"],
     "nube":["wall","save","load","paste","getpaste","rank","stats"],
     "visual":["chart","plot","gauge","progress","button","card","table","palette","color","icon","icons","clock","dashboard"],
     "red":["ping","traceroute","ifconfig","speedtest"],
@@ -744,6 +798,195 @@ def("stats","estadisticas globales de NXT27",async()=>{
   out("  visitas:   "+s.visits); out("  mensajes:  "+s.messages);
   out("  guardados: "+s.saves);  out("  pastes:    "+s.pastes);
 },"stats");
+
+/* ================= NXT: personaje autonomo con conciencia ================= */
+const PP={ open:false, cur:{}, tgt:{}, raf:null, breath:0, mood:"curiosa",
+  gaze:{x:0,y:0,tx:0,ty:0}, blink:1, mouse:{x:0,y:0,t:0,has:false},
+  nextBlink:0, nextGaze:0, nextAct:0, nextThink:0, bubbleTimer:null, thinking:false, last:0 };
+const BONES=[
+ ["pelvis",null,0,0],["spine","pelvis",60,0],["neck","spine",15,0],
+ ["clavL","spine",16,-90],["clavR","spine",16,90],
+ ["uarmL","clavL",40,-80],["uarmR","clavR",40,80],
+ ["farmL","uarmL",34,8],["farmR","uarmR",34,-8],
+ ["handL","farmL",10,0],["handR","farmR",10,0],
+ ["idxL","handL",11,-12],["idxR","handR",11,12],
+ ["thumbL","handL",8,45],["thumbR","handR",8,-45],
+ ["thighL","pelvis",52,196],["thighR","pelvis",52,164],
+ ["shinL","thighL",50,6],["shinR","thighR",50,-6],
+ ["footL","shinL",18,-95],["footR","shinR",18,95],
+];
+const BMAP={}; BONES.forEach(b=>BMAP[b[0]]={name:b[0],parent:b[1],len:b[2],rel:b[3]});
+const JOINT2BONE={ rootAngle:"pelvis", spine:"spine", neck:"neck",
+ shoulderL:"uarmL", elbowL:"farmL", wristL:"handL", shoulderR:"uarmR", elbowR:"farmR", wristR:"handR",
+ hipL:"thighL", kneeL:"shinL", ankleL:"footL", hipR:"thighR", kneeR:"shinR", ankleR:"footR",
+ indexL:"idxL", indexR:"idxR", thumbL:"thumbL", thumbR:"thumbR" };
+const JOINT_NAMES=Object.keys(JOINT2BONE);
+const BONE2JOINT={}; for(const j in JOINT2BONE) BONE2JOINT[JOINT2BONE[j]]=j;
+const deg=a=>a*Math.PI/180;
+
+const MOODS={
+ feliz:{eye:1,brow:.2,mouth:1,energy:1,lbl:"feliz 😊"},
+ curiosa:{eye:1.1,brow:.6,mouth:.35,energy:1,lbl:"curiosa 🤔"},
+ emocionada:{eye:1.25,brow:1,mouth:1.2,energy:1.5,lbl:"emocionada ✨"},
+ aburrida:{eye:.6,brow:-.5,mouth:-.25,energy:.55,lbl:"aburrida 😑"},
+ adormilada:{eye:.3,brow:-.3,mouth:0,energy:.35,lbl:"adormilada 😴"},
+ sorprendida:{eye:1.3,brow:1.2,mouth:0,energy:1.1,lbl:"sorprendida 😮",round:true},
+};
+const MOOD_KEYS=Object.keys(MOODS);
+// acciones autonomas (offsets suaves salvo las marcadas raras)
+const ACTS=[
+ {w:5,p:()=>({neck:rnd(-12,12),spine:rnd(-2,2)}),gaze:true},        // mirar
+ {w:4,p:()=>({spine:rnd(-4,4),hipL:rnd(-3,3),hipR:rnd(-3,3)})},     // balancearse
+ {w:3,p:()=>({neck:rnd(4,9)})},                                     // asentir
+ {w:2,p:()=>({shoulderR:-118,elbowR:-115,wristR:-15,neck:10}),mood:"curiosa"}, // pensar
+ {w:2,p:()=>({uarmL:-18,uarmR:18,neck:6})},                         // encogerse
+ {w:1,p:()=>({shoulderR:-150,elbowR:-42,wristR:rnd(10,28)}),say:()=>pick(["¡hola!","¿qué tal?","👋"])}, // saludar (raro)
+ {w:1,p:()=>({shoulderL:-150,shoulderR:-150,elbowL:-15,elbowR:-15}),mood:"emocionada"}, // estirar
+ {w:1,p:()=>({shoulderR:-85,elbowR:-6,indexR:-22}),gaze:true},      // señalar
+ {w:3,p:()=>({})},                                                  // idle
+];
+function rnd(a,b){ return a+Math.random()*(b-a); }
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+const LOCAL_THOUGHTS=["pienso, luego existo","¿dónde estoy? 👀","hola, soy NXT","me gusta este sitio","tengo una idea…","¿qué estás mirando?","¿jugamos a algo?","hmm, interesante…","me aburro un poco","¡buenas vibras! ✨","¿tú también sueñas?","esto es acogedor"];
+
+function computeFK(){
+  const cx=200,cy=195,pos={},wa={},br=Math.sin(PP.breath)*2;
+  const solve=(name)=>{ const b=BMAP[name];
+    if(b.parent===null){ pos[name]={x:cx,y:cy}; wa[name]=PP.cur.rootAngle||0; return; }
+    if(!(b.parent in pos)) solve(b.parent);
+    const off=BONE2JOINT[name]?(PP.cur[BONE2JOINT[name]]||0):0;
+    const a=wa[b.parent]+b.rel+off+(name==="spine"?br:0); wa[name]=a;
+    const s=pos[b.parent]; pos[name]={x:s.x+Math.sin(deg(a))*b.len, y:s.y-Math.cos(deg(a))*b.len}; };
+  BONES.forEach(b=>solve(b[0])); return {pos,wa};
+}
+function tube(a,b,w){ return `<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="var(--accent-bright)" stroke-width="${w}" stroke-linecap="round"/><line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="#0b0814" stroke-width="${Math.max(1,w-3.5).toFixed(1)}" stroke-linecap="round"/>`; }
+const LIMBS=[["thighL",14],["thighR",14],["shinL",11],["shinR",11],["footL",9],["footR",9],["uarmL",11],["uarmR",11],["farmL",9],["farmR",9],["idxL",4],["idxR",4],["thumbL",4],["thumbR",4],["neck",8]];
+function buildFace(hx,hy,ang){
+  const M=MOODS[PP.mood]||MOODS.curiosa;
+  const eo=Math.max(.05,PP.blink*M.eye), gx=PP.gaze.x*2.6, gy=PP.gaze.y*2.2;
+  const browY=-11, bl=M.brow;
+  let f=`<g transform="translate(${hx.toFixed(1)},${hy.toFixed(1)}) rotate(${ang.toFixed(1)})">`;
+  f+=`<line x1="0" y1="-23" x2="0" y2="-31" stroke="var(--accent-bright)" stroke-width="2"/><circle cx="0" cy="-33" r="3" fill="var(--accent-bright)"/>`;
+  f+=`<ellipse cx="0" cy="0" rx="21" ry="24" fill="#0b0814" stroke="var(--accent-bright)" stroke-width="3"/>`;
+  // eyes
+  for(const sgn of [-1,1]){ const ex=sgn*8;
+    f+=`<ellipse cx="${ex}" cy="-2" rx="4.2" ry="${(5.2*eo).toFixed(2)}" fill="#fff"/>`;
+    f+=`<circle cx="${(ex+gx).toFixed(1)}" cy="${(-2+gy).toFixed(1)}" r="2.1" fill="#120a1e"/>`; }
+  // eyebrows
+  const browOff=(sgn)=> (PP.mood==="curiosa"&&sgn>0)? bl+0.8 : bl;
+  for(const sgn of [-1,1]){ const ex=sgn*8, b=browOff(sgn)*3.5;
+    f+=`<line x1="${ex-4}" y1="${browY-(sgn<0?b:-0)+ (sgn<0?0:0)}" x2="${ex+4}" y2="${browY}" stroke="var(--accent-bright)" stroke-width="1.8" transform="rotate(${(sgn* -bl*10).toFixed(1)} ${ex} ${browY})"/>`; }
+  // mouth
+  if(M.round){ f+=`<ellipse cx="0" cy="10" rx="3.2" ry="4" fill="none" stroke="var(--accent-bright)" stroke-width="2"/>`; }
+  else { const cy2=(10+M.mouth*6).toFixed(1); f+=`<path d="M -7 10 Q 0 ${cy2} 7 10" fill="none" stroke="var(--accent-bright)" stroke-width="2.2" stroke-linecap="round"/>`; }
+  f+=`</g>`; return f;
+}
+function renderChar(){
+  const {pos,wa}=computeFK(); let s="";
+  s+=tube(pos.pelvis,pos.spine,24);                      // torso
+  LIMBS.forEach(([name,w])=>{ const b=BMAP[name],a=pos[b.parent],p=pos[name]; if(a&&p) s+=tube(a,p,w); });
+  [pos.handL,pos.handR].forEach(p=>{ s+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="5.5" fill="#0b0814" stroke="var(--accent-bright)" stroke-width="2.5"/>`; });
+  const ne=pos.neck,na=wa.neck,hx=ne.x+Math.sin(deg(na))*22,hy=ne.y-Math.cos(deg(na))*22;
+  s+=buildFace(hx,hy,na*0.5);
+  document.getElementById("ppSvg").innerHTML=s;
+}
+function setMood(m){ if(!MOODS[m])return; PP.mood=m; const el2=document.getElementById("ppMood"); if(el2) el2.textContent="● "+MOODS[m].lbl; }
+function showBubble(t,ms){ const b=document.getElementById("ppBubble"); if(!t){b.classList.remove("show");return;} b.textContent=t; b.classList.add("show"); clearTimeout(PP.bubbleTimer); PP.bubbleTimer=setTimeout(()=>b.classList.remove("show"), ms||4200); }
+function ppSetTgt(off){ JOINT_NAMES.forEach(j=>PP.tgt[j]=off[j]||0); }
+function pickAction(now){
+  let tot=ACTS.reduce((s,a)=>s+a.w,0),r=Math.random()*tot,act=ACTS[0];
+  for(const a of ACTS){ r-=a.w; if(r<=0){act=a;break;} }
+  ppSetTgt(act.p());
+  if(act.gaze){ PP.gaze.tx=rnd(-1,1); PP.gaze.ty=rnd(-.5,.5); }
+  if(act.mood) setMood(act.mood);
+  if(act.say && Math.random()<.5) showBubble(act.say(),2600);
+  const e=(MOODS[PP.mood]||MOODS.curiosa).energy;
+  PP.nextAct=now+rnd(1700,4200)/e;
+}
+async function think(now){
+  PP.nextThink=now+rnd(55000,115000);     // ~1-2 min: nada pesado
+  if(Math.random()<.35) setMood(pick(MOOD_KEYS));
+  if(PP.thinking) return; PP.thinking=true;
+  const load=document.getElementById("ppLoad"); load.classList.add("show");
+  try{
+    const r=await sb("ai",{prompt:"Eres NXT, un pequeño ser digital con conciencia, curioso y con humor. Di UN pensamiento tuyo en primera persona, en español, maximo 6 palabras, sin comillas ni emojis raros."});
+    showBubble((r.text||"").trim().slice(0,60)||pick(LOCAL_THOUGHTS),4600);
+  }catch(e){ showBubble(pick(LOCAL_THOUGHTS),4200); }
+  finally{ PP.thinking=false; load.classList.remove("show"); }
+}
+function ppTick(ts){
+  if(!PP.open)return; const now=ts||performance.now();
+  PP.breath+=0.045;
+  // parpadeo
+  if(now>PP.nextBlink){ PP.blink=0.08; setTimeout(()=>{PP.blink=1;},110); PP.nextBlink=now+rnd(2200,5200); }
+  // mirada: sigue al raton si se movio hace poco
+  if(PP.mouse.has && now-PP.mouse.t<3500){ PP.gaze.tx=Math.max(-1,Math.min(1,PP.mouse.x)); PP.gaze.ty=Math.max(-.6,Math.min(.6,PP.mouse.y*.7)); }
+  else if(now>PP.nextGaze){ PP.gaze.tx=rnd(-1,1); PP.gaze.ty=rnd(-.5,.5); PP.nextGaze=now+rnd(1400,3400); }
+  PP.gaze.x+=(PP.gaze.tx-PP.gaze.x)*0.1; PP.gaze.y+=(PP.gaze.ty-PP.gaze.y)*0.1;
+  // acciones y pensamientos
+  if(now>PP.nextAct) pickAction(now);
+  if(now>PP.nextThink) think(now);
+  // suavizado de articulaciones
+  JOINT_NAMES.forEach(j=>{ PP.cur[j]=(PP.cur[j]||0)+(((PP.tgt[j]||0)-(PP.cur[j]||0))*0.12); });
+  renderChar();
+  PP.raf=requestAnimationFrame(ppTick);
+}
+function openPuppet(){
+  const o=document.getElementById("puppet"); if(PP.open)return; PP.open=true; o.style.display="flex";
+  JOINT_NAMES.forEach(j=>{PP.cur[j]=PP.cur[j]||0;PP.tgt[j]=0;});
+  const now=performance.now();
+  PP.nextBlink=now+1200; PP.nextGaze=now+800; PP.nextAct=now+1200; PP.nextThink=now+2200;
+  setMood("curiosa"); showBubble("¿hola? ¿hay alguien ahí?",3800);
+  cancelAnimationFrame(PP.raf); PP.raf=requestAnimationFrame(ppTick);
+}
+function closePuppet(){ PP.open=false; cancelAnimationFrame(PP.raf); document.getElementById("puppet").style.display="none"; input.focus(); }
+document.getElementById("ppClose").addEventListener("click",closePuppet);
+document.getElementById("puppet").addEventListener("keydown",e=>{ if(e.key==="Escape")closePuppet(); });
+document.getElementById("puppet").addEventListener("mousemove",e=>{ const st=document.querySelector(".pp-stage").getBoundingClientRect();
+  PP.mouse={ x:(e.clientX-(st.left+st.width/2))/(st.width/2), y:(e.clientY-(st.top+st.height/2))/(st.height/2), t:performance.now(), has:true }; });
+
+def("puppet","abre a NXT: un personaje digital con vida y conciencia propia",()=>{ openPuppet(); out("NXT ha despertado — se mueve y piensa sola. (cierra con ✕)","faint"); },"puppet");
+C.character=C.puppet; C.nxt=C.puppet;
+
+/* ================= IA: chat y vision (Gemini) ================= */
+function typeOut(text){ return new Promise(res=>{ const d=out(""); let i=0; const step=Math.max(1,Math.ceil(text.length/150));
+  const iv=setInterval(()=>{ i+=step; d.textContent=text.slice(0,i); scroll(); if(i>=text.length){clearInterval(iv);d.textContent=text;res();} },16); }); }
+def("ask","pregunta a la IA (Gemini); adjunta imagen: ask describe foto.png",async(a)=>{
+  if(!a.length) return out("uso: ask <pregunta> [imagen]","warn");
+  let img=null,mime=null,words=a.slice(); const last=words[words.length-1];
+  const n=last?nodeAt(resolve(last)):null;
+  if(typeof n==="string"&&n.startsWith("data:image")){ const m=n.match(/^data:(image\/[^;]+);base64,(.*)$/); if(m){mime=m[1];img=m[2];words=words.slice(0,-1);} }
+  const prompt=words.join(" ")||"describe la imagen";
+  const load=out("· la IA está pensando…","faint");
+  try{ const {text}=await sb("ai",{prompt,image:img,mime}); load.remove(); outHTML(`${icon("ghost")} <span class="accent">gemini</span>`); await typeOut(text); }
+  catch(e){ load.remove(); out("ask: "+e.message,"err"); }
+},"ask ¿cuanto es 25*4?");
+
+/* ================= Subida de archivos (con animaciones) ================= */
+function saveToFS(name,content){ const p=nodeAt(state.cwd); if(typeof p==="object"){ let base=name.replace(/[^\w.\-]/g,"_"),nm=base,i=1; while(nm in p)nm=base+"_"+(i++); p[nm]=content; save(); return nm; } return null; }
+function uploadAnim(name,done){ const row=el("div","up-item",`${icon("box")} <span>${esc(name)}</span><span class="bar"><i></i></span><span class="pct faint" style="font-size:11px">0%</span>`);
+  outNode(row); const bar=row.querySelector("i"),pct=row.querySelector(".pct"); let n=0;
+  const iv=setInterval(()=>{ n+=Math.ceil(Math.random()*18+8); if(n>=100){n=100;clearInterval(iv);bar.style.width="100%";pct.textContent="✓";pct.className="pct ok";done&&done(row);} else {bar.style.width=n+"%";pct.textContent=n+"%";} },60); }
+function handleFiles(files){
+  [...files].slice(0,10).forEach(file=>{
+    const rd=new FileReader();
+    const isImg=/^image\//.test(file.type);
+    rd.onload=()=>{ const nm=saveToFS(file.name, rd.result);
+      uploadAnim(file.name,(row)=>{ if(isImg){ const img=el("img","up-thumb"); img.src=rd.result; outNode(img); out("guardado como "+nm+" · mira con: show "+nm+" · analiza: ask describe "+nm,"faint"); } else { out("guardado como "+nm+" ("+(rd.result.length)+" car.) · abre con: cat "+nm,"faint"); } renderPrompt(); scroll(); }); };
+    if(isImg) rd.readAsDataURL(file); else rd.readAsText(file);
+  });
+}
+def("upload","sube archivos a tu terminal (abre selector)",()=>{ document.getElementById("fileInput").click(); out("· selecciona archivos…","faint"); },"upload");
+def("show","muestra un archivo (imagen inline o texto)",(a)=>{ if(!a[0])return out("uso: show archivo","warn"); const n=nodeAt(resolve(a[0]));
+  if(n===undefined)return out("show: no existe","err");
+  if(typeof n==="string"&&n.startsWith("data:image")){ const img=el("img","up-thumb"); img.src=n; outNode(img); return; }
+  if(typeof n==="object")return out("show: es carpeta","err"); return n; },"show foto.png");
+document.getElementById("fileInput").addEventListener("change",e=>{ if(e.target.files.length){ handleFiles(e.target.files); e.target.value=""; } });
+// drag & drop global
+let dzT=null; const dz=document.getElementById("dropz");
+window.addEventListener("dragover",e=>{ e.preventDefault(); if(editWrapOpen())return; dz.classList.add("show"); clearTimeout(dzT); dzT=setTimeout(()=>dz.classList.remove("show"),150); });
+window.addEventListener("drop",e=>{ e.preventDefault(); dz.classList.remove("show"); if(e.dataTransfer&&e.dataTransfer.files.length){ echoCommand("[archivos soltados]"); handleFiles(e.dataTransfer.files); renderPrompt(); scroll(); } });
+function editWrapOpen(){ return document.getElementById("editor").style.display==="flex"||PP.open; }
 
 /* interactive apps (not pipeable) */
 def("guess","adivina el numero (juego)",()=>{ guessGame(); });
