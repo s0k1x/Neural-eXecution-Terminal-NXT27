@@ -1,0 +1,37 @@
+name: build-exe
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install pywebview==5.3.2 pyinstaller==6.11.1
+
+      - name: Build NXT27.exe
+        run: pyinstaller --noconfirm --onefile --windowed --name NXT27 --add-data "index.html;." app.py
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NXT27-exe
+          path: dist/NXT27.exe
+
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/NXT27.exe
