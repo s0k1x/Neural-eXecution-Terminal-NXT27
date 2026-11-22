@@ -31,6 +31,8 @@ Todo funciona **offline**, sin servidores. Prueba en vivo:
 - **Archivos:** `ls` `cd` `pwd` `cat` `tac` `head` `tail` `tree` `find` `grep` `wc` `stat` `du` `mkdir` `rmdir` `touch` `rm` `mv` `cp` `edit`/`nano`
 - **Texto:** `rev` `upper` `lower` `sort` `uniq` `nl` `tr` `base64` `rot13` `hash` `uuid` `urlencode` `urldecode` `json` `morse` `password` `seq` `cal`
 - **Sistema:** `neofetch` `whoami` `uname` `hostname` `uptime` `date` `free` `df` `ps` `top` `battery` `theme`
+- **Seguridad (pentest/CTF):** `hash` `hashid` `hex/unhex` `bin` `caesar` `atbash` `vigenere` `xor` `jwt` `cidr` `strength` `entropy` `portref/ports` `wifi` `nmap` `whois` `dig` `scan` `crack` `defang` `ua` (recon de red = SIMULADO/educativo)
+- **IA / agente:** `ask` (chat + visión), `agent on` + `ai <petición>` (el agente ejecuta comandos de la terminal por ti), `ultra` (modo NXT ULTRA con contraseña y animación)
 - **Red (simulado):** `ping` `traceroute` `ifconfig` `speedtest`
 - **Dev:** `git` (init/add/commit/log/branch/checkout/diff sobre el FS virtual)
 - **Nube (Supabase):** `wall` (muro global) · `save`/`load` (guardar en la nube con código) · `paste`/`getpaste` · `rank` · `stats`
