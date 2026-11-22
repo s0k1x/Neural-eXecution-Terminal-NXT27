@@ -1,64 +1,62 @@
 # Neural eXecution Terminal · NXT27
 
-Demo visual con estética de terminal hacker: intro de manos + chispa, ventana
-emergente, lluvia matrix, logo **NXT27** con glitch, montañas ASCII en
-movimiento y un navegador de módulos con navegación por teclado.
+Terminal **web funcional** con estética hacker: escribes comandos reales y se
+ejecutan en tu navegador — con **pipes**, **redirección**, sistema de archivos
+persistente, autocompletado, autosugerencias tipo Fish, temas, editor de texto
+y un montón de comandos (incluidos clásicos divertidos como `cowsay`, `figlet`,
+`lolcat`, `cmatrix`, `fortune`, `neofetch`).
 
-> **Aviso:** es una **demo visual**. Los módulos son cáscaras no funcionales
-> ("DEMO · SIN FUNCIONALIDAD"): no ejecutan ni generan nada.
+Todo funciona **offline**, sin servidores. Prueba en vivo:
+**https://s0k1x.github.io/Neural-eXecution-Terminal-NXT27/**
 
 ---
 
-## 1. Abrir rápido (navegador)
+## Probarla
 
-Descarga `index.html` y haz doble clic. No necesita internet ni instalación.
+- **Navegador:** descarga `index.html` y doble clic. Nada que instalar.
+- **Un comando (Termux/Linux):**
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/s0k1x/Neural-eXecution-Terminal-NXT27/main/nxt27.sh | bash
+  ```
+  Sirve en `http://localhost:8027`. (`pkg install -y curl` si falta en Termux.)
+- **Windows `.exe`:** pestaña **Actions** → run de `build-exe` → **Artifacts** →
+  `NXT27-exe` (`NXT27.exe` firmado + `NXT27-publisher.cer`). También se adjunta a
+  la **Release** al publicar un tag `v*`.
 
-## 2. Un solo comando (Termux / Linux)
+---
 
-Descarga, instala lo necesario, arranca un servidor local y abre el navegador:
+## Comandos
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/s0k1x/Neural-eXecution-Terminal-NXT27/main/nxt27.sh | bash
+- **Shell:** `help` `man` `clear` `exit` `history` `alias` `export` `env` `which` `type` `echo` `printf` `repeat` `sleep`
+- **Archivos:** `ls` `cd` `pwd` `cat` `tac` `head` `tail` `tree` `find` `grep` `wc` `stat` `du` `mkdir` `rmdir` `touch` `rm` `mv` `cp` `edit`/`nano`
+- **Texto:** `rev` `upper` `lower` `sort` `uniq` `nl` `tr` `base64` `rot13` `hash` `uuid` `urlencode` `urldecode` `json` `morse` `password` `seq` `cal`
+- **Sistema:** `neofetch` `whoami` `uname` `hostname` `uptime` `date` `free` `df` `ps` `top` `battery` `theme`
+- **Red (simulado):** `ping` `traceroute` `ifconfig` `speedtest`
+- **Diversión:** `figlet` `banner` `cowsay` `cowthink` `lolcat` `fortune` `matrix` `sl` `hack` `8ball` `dice` `coin` `roll` `rps` `guess` `joke` `yes`
+
+**Potencia:**
+```sh
+figlet NXT27 | lolcat          # ASCII gigante en arcoíris
+fortune | cowsay               # cita aleatoria en una vaca
+echo hola | upper | rev        # pipes encadenados
+seq 100 | tail -5              # tubería con utilidades
+echo "nota" > diario.txt       # redirección a archivo (persiste)
+theme matrix                   # cambia el tema de color
 ```
 
-Se sirve en `http://localhost:8027`. Para detener: `Ctrl+C`.
-Si no tienes `curl` en Termux: `pkg install -y curl` y repite.
+**Atajos:** `↑`/`↓` historial · `→` acepta la sugerencia fantasma · `Tab`
+autocompleta · `Ctrl+L` limpia · `Ctrl+C` cancela · `Ctrl+U` borra la línea.
+En el editor: `Ctrl+S` guarda, `Esc` sale. Funciona en móvil (toca y escribe).
 
-## 3. App de escritorio (Windows .exe)
-
-El `.exe` abre la terminal en su propia ventana (motor Edge WebView2 de Windows).
-
-- **Descarga:** pestaña **Actions** → último run de `build-exe` → sección
-  **Artifacts** → `NXT27-exe` (contiene `NXT27.exe` + `NXT27-publisher.cer`).
-- También se adjunta a la **Release** si se publica un tag `v*`.
-
-### Firma digital
-
-`NXT27.exe` está firmado (Authenticode SHA-256, autofirmado). Al ser
-autofirmado, SmartScreen puede avisar la primera vez
-("Más información → Ejecutar de todas formas"). Para que Windows confíe en la
-firma, instala `NXT27-publisher.cer` en *Entidades de certificación raíz de
-confianza*. Una firma sin avisos requiere un certificado de code-signing de
-una CA (de pago).
+El estado (archivos, historial, tema, alias) se guarda en tu navegador.
 
 ---
-
-## Controles
-
-| Acción            | Tecla                 |
-|-------------------|-----------------------|
-| Explorar tarjetas | ↑ ↓ ← →               |
-| Abrir módulo      | Enter (o tocar)       |
-| Cambiar categoría | Tab                   |
-| Acceso directo    | 1–9                   |
-| Volver            | Esc                   |
-| Saltar intro      | botón **SKIP INTRO**  |
 
 ## Estructura
 
-| Archivo                         | Qué es                                    |
-|---------------------------------|-------------------------------------------|
-| `index.html`                    | La demo (autónoma, sin dependencias)      |
-| `nxt27.sh`                      | Instalador/lanzador de un comando         |
-| `app.py`                        | Envoltorio de escritorio (pywebview)      |
-| `.github/workflows/build-exe.yml` | Compila y firma `NXT27.exe` en Windows  |
+| Archivo | Qué es |
+|---|---|
+| `index.html` | La terminal (autónoma, sin dependencias) |
+| `site/` + `.github/workflows/pages.yml` | Landing web + deploy a GitHub Pages |
+| `nxt27.sh` | Instalador/lanzador de un comando |
+| `app.py` + `.github/workflows/build-exe.yml` | App de escritorio `.exe` (firmada) |
